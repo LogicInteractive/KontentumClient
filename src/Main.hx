@@ -3,6 +3,7 @@ package;
 import cpp.Lib;
 import cpp.vm.Thread;
 import haxe.Http;
+import haxe.Json;
 import haxe.Timer;
 import haxe.macro.Expr.Error;
 import sys.io.File;
@@ -15,9 +16,16 @@ class Main
 {
 	/////////////////////////////////////////////////////////////////////////////////////
 	
-	static var settings		: Dynamic;
-	static var timer		: Timer;
-	static var thread		: Thread;
+	static var jsonPing			: Dynamic;
+	static var settings			: Dynamic;
+	static var timer			: Timer;
+	static var thread			: Thread;
+	
+	static var restIP			: String;
+	static var restAPI			: String;
+	static var restID			: String;
+	static var restURL			: String;
+	static var intervalTime		: Float;
 
 	//===================================================================================
 	// Main 
@@ -36,26 +44,34 @@ class Main
 		}
 		
 		settings = fromXML(Xml.parse(configFile));
-	
-		//thread = Thread.create(pingThread);
-		//thread.sendMessage(Thread.current());
+
+		intervalTime = Std.parseFloat(settings.config.kontentum.intervalMS) * 0.001;
 		
-		//while (true)
-		//{
-			//Sys.sleep(15);
-		//}
+		restIP = settings.config.kontentum.ip;
+		restAPI = settings.config.kontentum.api;
+		restID = settings.config.kontentum.exhibitID;
+		restURL = restIP + "/" + restAPI +"/" + restURL;
+
+		thread = Thread.create(pingThread);
+		thread.sendMessage(Thread.current());
 		
-		//Sys.sleep(15);
+		while (true)
+		{
+			Sys.sleep(10);
+		}
+		
 		//SystemShutdown();
-		SystemReboot();
+		//SystemReboot();
 	}
 	
 	static function pingThread() 
 	{
 		while (true)
 		{
-			trace( Http.requestUrl(settings.config.kontentum.ip+"/rest/getExhibit/"+settings.config.kontentum.exhibitID) );
-			Sys.sleep(Std.parseFloat(settings.config.intervalMS)*0.001);
+			var restStr = Http.requestUrl(restURL);
+			jsonPing = Json.parse(restStr);
+			trace(restStr);
+			Sys.sleep(intervalTime);
 		}
 	}
 
@@ -65,7 +81,7 @@ class Main
 	{
 		#if windows
 		Sys.command("shutdown", ["/r", "/f", "/t", "0"]);
-		#elseif osx
+		#elseif mac
 		
 		#end
 	}
@@ -74,17 +90,15 @@ class Main
 	{
 		#if windows
 		Sys.command("shutdown",["/s","/f","/t","0"]);
-		#elseif osx
+		#elseif mac
 		
 		#end
 	}
 	
+	/////////////////////////////////////////////////////////////////////////////////////
 	//===================================================================================
 	// Utils
 	//-----------------------------------------------------------------------------------
-	/////////////////////////////////////////////////////////////////////////////////////
-	
-	/////////////////////////////////////////////////////////////////////////////////////
 	
 	static function fromXML(xml:Xml):Dynamic
 	{
