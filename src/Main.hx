@@ -12,6 +12,7 @@ import sys.io.File;
  * ...
  * @author Tommy S.
  */
+@:cppFileCode('#include <Windows.h>')
 class Main 
 {
 	/////////////////////////////////////////////////////////////////////////////////////
@@ -26,6 +27,8 @@ class Main
 	static var restID			: String;
 	static var restURL			: String;
 	static var intervalTime		: Float;
+	static var firstCommand		: String;
+	static var launch			: String;
 
 	//===================================================================================
 	// Main 
@@ -33,6 +36,8 @@ class Main
 	
 	static function main() 
 	{
+		untyped __cpp__('FreeConsole();');
+		
 		var configFile = "";
 		try
 		{
@@ -51,18 +56,18 @@ class Main
 		restIP = settings.config.kontentum.ip;
 		restAPI = settings.config.kontentum.api;
 		restID = settings.config.kontentum.exhibitID;
-		restURL = restIP + "/" + restAPI +"/" + restURL;
+		restURL = restIP + "/" + restAPI +"/" + restID;
 
 		thread = Thread.create(pingThread);
 		thread.sendMessage(Thread.current());
+		
+		if (settings.config.killexplorer == "true")
+			KillExplorer();
 		
 		while (true)
 		{
 			Sys.sleep(10);
 		}
-		
-		//SystemShutdown();
-		//SystemReboot();
 	}
 	
 	static function pingThread() 
@@ -71,29 +76,72 @@ class Main
 		{
 			var restStr = Http.requestUrl(restURL);
 			jsonPing = Json.parse(restStr);
-			trace(restStr);
+			var success = jsonPing.success;
+			if (success == "true")
+			{
+				var command = jsonPing.callback;
+				parseCommand(command);
+				
+				if (launch == null)
+				{
+					if (jsonPing.launch!=null && jsonPing.launch!="")
+						launch = jsonPing.launch;
+						
+					runProcess(launch);
+				}
+			}
+			else
+			{
+				trace("Error: ClientID " + restID + " not found! ");
+			}
 			Sys.sleep(intervalTime);
 		}
+	}
+	
+	static function parseCommand(cmd:String) 
+	{
+		if (firstCommand != null)
+		{
+			switch (cmd) 
+			{
+				case "reboot":		SystemReboot();
+				case "shutdown":	SystemShutdown();
+			}
+		}
+		else
+			firstCommand = cmd;
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////
 
 	static function SystemReboot() 
 	{
-		#if windows
+		//#if win
+		//trace("REBOOT");
 		Sys.command("shutdown", ["/r", "/f", "/t", "0"]);
-		#elseif mac
+		//#elseif mac
 		
-		#end
+		//#end
 	}
 	
 	static function SystemShutdown() 
 	{
-		#if windows
+		//#if win
+		//trace("SHUTDOWN");
 		Sys.command("shutdown",["/s","/f","/t","0"]);
-		#elseif mac
-		
-		#end
+		//#elseif mac
+		//
+		//#end
+	}
+	
+	static function KillExplorer() 
+	{
+		Sys.command("taskkill",["/F","/IM","explorer.exe"]);
+	}
+	
+	static function launchExplorer() 
+	{
+		Sys.command("explorer.exe");
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////
@@ -101,6 +149,11 @@ class Main
 	// Utils
 	//-----------------------------------------------------------------------------------
 	
+	static function runProcess(exeName:String)
+	{
+		untyped __cpp__('WinExec(exeName, SW_SHOW)');
+	}
+		
 	static function fromXML(xml:Xml):Dynamic
 	{
 		var o:Dynamic = {};
