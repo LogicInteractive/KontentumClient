@@ -41,6 +41,7 @@ class Main
 		catch (e:Error)
 		{
 			trace("Config file not found");
+			Sys.exit(1);
 		}
 		
 		settings = fromXML(Xml.parse(configFile));

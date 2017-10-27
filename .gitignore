@@ -1,6 +1,6 @@
-bin/include
-bin/obj
-bin/src
+bin/include/
+bin/obj/
+bin/src/
 Build.xml
 HxcppConfig-19.h
 Main.exe.hash

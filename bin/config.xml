@@ -1,0 +1,8 @@
+<config>
+	<kontentum>
+		<ip>http://kontentum.logicinteractive.no</ip>
+		<api>rest/getExhibit</api>
+		<exhibitID>18</exhibitID>
+		<intervalMS>1000</intervalMS>
+	</kontentum>
+</config>
