@@ -4,6 +4,8 @@
 		<api>rest/pingClient</api>
 		<exhibitID>23</exhibitID>
 		<intervalMS>1000</intervalMS>
+		<token></token>
 	</kontentum>
-	<killexplorer>true</killexplorer>
+	<killexplorer>false</killexplorer>
+	<debug>false</debug>
 </config>

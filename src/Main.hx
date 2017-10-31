@@ -1,10 +1,16 @@
 package;
 
+import cpp.Char;
+import cpp.ConstCharStar;
+import cpp.ConstPointer;
 import cpp.Lib;
+import cpp.NativeString;
+import cpp.RawConstPointer;
 import cpp.vm.Thread;
 import haxe.Http;
 import haxe.Json;
 import haxe.Timer;
+import haxe.io.Output;
 import haxe.macro.Expr.Error;
 import sys.io.File;
 
@@ -12,9 +18,28 @@ import sys.io.File;
  * ...
  * @author Tommy S.
  */
-@:cppFileCode('#include <Windows.h>')
+
+typedef NetworkAdapterInfo =
+{
+	@:optional	var ip			: String;
+	@:optional	var mac			: String;
+	@:optional	var hostname	: String;
+}
+ 
+@:cppFileCode('
+#include <winsock2.h>
+#include <iostream>
+#include <stdio.h>
+#include <Windows.h>
+#include <Iphlpapi.h>
+#pragma comment(lib, "iphlpapi.lib")
+')
 class Main 
 {
+	static public inline var ADAPTER_TYPE_ANY			: Int		= 0;
+	static public inline var ADAPTER_TYPE_ETHERNET		: Int		= 6;
+	static public inline var ADAPTER_TYPE_WIFI			: Int		= 71;
+	
 	/////////////////////////////////////////////////////////////////////////////////////
 	
 	static var jsonPing			: Dynamic;
@@ -22,13 +47,18 @@ class Main
 	static var timer			: Timer;
 	static var thread			: Thread;
 	
+	static var token			: String;
 	static var restIP			: String;
 	static var restAPI			: String;
 	static var restID			: String;
 	static var restURL			: String;
+	static var restURLBase		: String;
+	static var ipIsSent			: Bool;
 	static var intervalTime		: Float;
 	static var firstCommand		: String;
 	static var launch			: String;
+	static var localIP			: String;
+	static var localMAC			: String;
 
 	//===================================================================================
 	// Main 
@@ -36,8 +66,6 @@ class Main
 	
 	static function main() 
 	{
-		untyped __cpp__('FreeConsole();');
-		
 		var configFile = "";
 		try
 		{
@@ -50,14 +78,24 @@ class Main
 		}
 		
 		settings = fromXML(Xml.parse(configFile));
+		
+		if (settings.config.debug!="true")
+			untyped __cpp__('FreeConsole();');
 
 		intervalTime = Std.parseFloat(settings.config.kontentum.intervalMS) * 0.001;
 		
+		token = settings.config.kontentum.token;
 		restIP = settings.config.kontentum.ip;
 		restAPI = settings.config.kontentum.api;
 		restID = settings.config.kontentum.exhibitID;
-		restURL = restIP + "/" + restAPI +"/" + restID;
+		
+		if (token == null)
+			token = "_";
+		
+		restURLBase = restIP + "/" + restAPI +"/" + restID + "/" + token;
 
+		var adapter = getNetworkAdapterInfo( ADAPTER_TYPE_ANY );
+		restURL = restURLBase + "/" +  StringTools.urlEncode(adapter.ip) + "/" + StringTools.urlEncode(adapter.mac) + "/" + StringTools.urlEncode(adapter.hostname);
 		thread = Thread.create(pingThread);
 		thread.sendMessage(Thread.current());
 		
@@ -74,25 +112,36 @@ class Main
 	{
 		while (true)
 		{
-			var restStr = Http.requestUrl(restURL);
-			jsonPing = Json.parse(restStr);
-			var success = jsonPing.success;
-			if (success == "true")
-			{
-				var command = jsonPing.callback;
-				parseCommand(command);
+			if (settings.config.debug=="true")
+				trace(restURL);
 				
-				if (launch == null)
-				{
-					if (jsonPing.launch!=null && jsonPing.launch!="")
-						launch = jsonPing.launch;
-						
-					runProcess(launch);
-				}
-			}
-			else
+			var restStr = Http.requestUrl(restURL);
+			if (restStr != null && restStr != "")
 			{
-				trace("Error: ClientID " + restID + " not found! ");
+				jsonPing = Json.parse(restStr);
+				var success = jsonPing.success;
+				if (success == "true")
+				{
+					var command = jsonPing.callback;
+					parseCommand(command);
+					
+					if (launch == null)
+					{
+						if (jsonPing.launch!=null && jsonPing.launch!="")
+							launch = jsonPing.launch;
+							
+						runProcess(launch);
+					}
+					if (!ipIsSent)
+					{
+						restURL = restURLBase;
+						ipIsSent = true;
+					}
+				}
+				else
+				{
+					trace("Error: ClientID " + restID + " not found! ");
+				}
 			}
 			Sys.sleep(intervalTime);
 		}
@@ -285,6 +334,58 @@ class Main
 		}
 		
 		return isNumber;
+	}
+	
+	/////////////////////////////////////////////////////////////////////////////////////
+	
+	static function getNetworkAdapterInfo(adaptertype:Int):NetworkAdapterInfo
+	{
+		var ip:ConstPointer<Char> = null;
+		var mac:ConstPointer<Char> = null;
+		
+		untyped __cpp__('
+		
+			PIP_ADAPTER_INFO AdapterInfo;
+			DWORD dwBufLen = sizeof(AdapterInfo);
+			char* mac_addr = (char*)malloc(17);
+			std::string ipstr;
+
+			AdapterInfo = (IP_ADAPTER_INFO*) malloc(sizeof(IP_ADAPTER_INFO));
+			
+			if (AdapterInfo != NULL)
+			{
+				if (GetAdaptersInfo(AdapterInfo, & dwBufLen) == ERROR_BUFFER_OVERFLOW)
+				{
+					AdapterInfo = (IP_ADAPTER_INFO*) malloc(dwBufLen);
+					if (AdapterInfo != NULL)
+					{
+						if (GetAdaptersInfo(AdapterInfo, & dwBufLen) == NO_ERROR)
+						{
+							PIP_ADAPTER_INFO pAdapterInfo = AdapterInfo;// Contains pointer to current adapter info
+							do
+							{
+								//Prints mac-adress to a string..
+								sprintf(mac_addr, "%02X:%02X:%02X:%02X:%02X:%02X", pAdapterInfo->Address[0], pAdapterInfo->Address[1], pAdapterInfo->Address[2], pAdapterInfo->Address[3], pAdapterInfo->Address[4], pAdapterInfo->Address[5]);
+								//printf("Address: %s, mac: %s\\n", pAdapterInfo->IpAddressList.IpAddress.String, mac_addr);
+								
+								if (adaptertype == pAdapterInfo->Type || adaptertype == 0) // Is adapter type matching? 6 : Ethernet, 71 : Wifi
+								{
+									mac = mac_addr;
+									ip = pAdapterInfo->IpAddressList.IpAddress.String;
+									if ((int)ip[0] != 48) //Is first char in ip string "0" ? If not, break!
+										break;
+								}
+								pAdapterInfo = pAdapterInfo->Next;        
+							}
+							while(pAdapterInfo);                        
+						}
+					}
+				}
+			}
+			free(AdapterInfo);
+		');
+		
+		return { ip:NativeString.fromPointer(ip), mac:NativeString.fromPointer(mac), hostname:Sys.getEnv("COMPUTERNAME") };
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////
