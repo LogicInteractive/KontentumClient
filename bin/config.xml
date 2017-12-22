@@ -1,11 +1,14 @@
 <config>
 	<kontentum>
+		<!--<ip>http://192.168.1.10/kontentum</ip>-->
 		<ip>http://kontentum.logicinteractive.no</ip>
 		<api>rest/pingClient</api>
-		<exhibitID>23</exhibitID>
-		<intervalMS>1000</intervalMS>
-		<token></token>
+		<clientID>227</clientID>
+		<token />
+		<interval>1.0</interval>
+		<delay>0.0</delay>
 	</kontentum>
-	<killexplorer>false</killexplorer>
-	<debug>false</debug>
+	<killexplorer>false</killexplorer> 
+	<debug>false</debug> 
+	<restartAutomatic>true</restartAutomatic> 
 </config>

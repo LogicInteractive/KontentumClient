@@ -1,9 +1,0 @@
-<config>
-	<kontentum>
-		<ip>http://kontentum.logicinteractive.no</ip>
-		<api>rest/pingClient</api>
-		<exhibitID>23</exhibitID>
-		<intervalMS>1000</intervalMS>
-	</kontentum>
-	<killexplorer>true</killexplorer>
-</config>

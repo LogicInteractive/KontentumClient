@@ -7,12 +7,15 @@ import cpp.Lib;
 import cpp.NativeString;
 import cpp.RawConstPointer;
 import cpp.vm.Thread;
+import haxe.CallStack;
 import haxe.Http;
 import haxe.Json;
 import haxe.Timer;
 import haxe.io.Output;
 import haxe.macro.Expr.Error;
+import sys.FileSystem;
 import sys.io.File;
+import sys.io.FileOutput;
 
 /**
  * ...
@@ -53,12 +56,19 @@ class Main
 	static var restID			: String;
 	static var restURL			: String;
 	static var restURLBase		: String;
+	static var restartAutomatic	: String;
 	static var ipIsSent			: Bool;
-	static var intervalTime		: Float;
+	static var intervalTime		: Float			= 1.0;
+	static var delayTime		: Float			= 0.0;
 	static var firstCommand		: String;
 	static var launch			: String;
 	static var localIP			: String;
 	static var localMAC			: String;
+
+	static var http				: Http;
+	static var restStr			: String;
+	static var waitForResponse	: Bool;
+	static var pingTimer		: Timer;
 
 	//===================================================================================
 	// Main 
@@ -66,6 +76,8 @@ class Main
 	
 	static function main() 
 	{
+		CrashHandler.setCPPExceptionHandler(onCrash, false);
+		
 		var configFile = "";
 		try
 		{
@@ -82,69 +94,177 @@ class Main
 		if (settings.config.debug!="true")
 			untyped __cpp__('FreeConsole();');
 
-		intervalTime = Std.parseFloat(settings.config.kontentum.intervalMS) * 0.001;
+		intervalTime = Std.parseFloat(settings.config.kontentum.interval);
+		delayTime = Std.parseFloat(settings.config.kontentum.delay);
+		
+		var args = Sys.args();
+		if (args != null && args.length > 1)
+		{
+			if (args[0] == "delay")
+			{
+				var dly:Float = Std.parseFloat(args[1]);
+				if (dly > 0.0)
+					delayTime = dly;
+			}
+		}
 		
 		token = settings.config.kontentum.token;
 		restIP = settings.config.kontentum.ip;
 		restAPI = settings.config.kontentum.api;
-		restID = settings.config.kontentum.exhibitID;
+		restID = settings.config.kontentum.clientID;
+		restartAutomatic = settings.config.restartAutomatic;
 		
 		if (token == null)
 			token = "_";
 		
+		if (restIP == null || restAPI == null || restID == null)
+		{
+			trace("Malformed config xml! Exiting.");
+			Sys.exit(1);			
+		}
+		
 		restURLBase = restIP + "/" + restAPI +"/" + restID + "/" + token;
 
-		var adapter = getNetworkAdapterInfo( ADAPTER_TYPE_ANY );
-		restURL = restURLBase + "/" +  StringTools.urlEncode(adapter.ip) + "/" + StringTools.urlEncode(adapter.mac) + "/" + StringTools.urlEncode(adapter.hostname);
-		thread = Thread.create(pingThread);
-		thread.sendMessage(Thread.current());
-		
 		if (settings.config.killexplorer == "true")
 			KillExplorer();
 		
-		while (true)
+		if (delayTime > 0)
+			Sys.sleep(delayTime);
+			
+		initMain();
+	}
+	
+	static function initMain() 
+	{
+		//FORCE CRASH!!!!!
+/*		untyped __cpp__('
+			*((unsigned int*)0) = 0xDEAD;
+		');*/
+		
+		var adapter = getNetworkAdapterInfo( ADAPTER_TYPE_ANY );
+		if (adapter.ip == "0.0.0.0")
 		{
-			Sys.sleep(10);
+			trace("Network adapter not found!");
+			Timer.delay(initMain, 5000);
+		}
+		else
+		{
+			restURL = restURLBase + "/" +  StringTools.urlEncode(adapter.ip) + "/" + StringTools.urlEncode(adapter.mac) + "/" + StringTools.urlEncode(adapter.hostname);
+			//thread = Thread.create(pingThread);
+			//thread.sendMessage(Thread.current());
+			
+			http = new Http(restURL);
+			http.onData = onPingData;
+			http.onError = onPingError;
+			http.cnxTimeout = 30.0;			
+			
+			pingTimer = new Timer(Std.int(intervalTime*1000));
+			pingTimer.run = pingCallback;
+			//while (true)
+			//{
+				//Sys.sleep(10);
+			//}
 		}
 	}
 	
-	static function pingThread() 
+	//static function pingThread() 
+	//{
+		//http = new Http(restURL);
+		//http.onData = onPingData;
+		//http.onError = onPingError;
+		//http.cnxTimeout = 30.0;
+		//
+		//makeRequest();
+	//}
+	
+	static function pingCallback() 
 	{
-		while (true)
+		if (!waitForResponse)
+			makeRequest();
+	}
+
+	static function makeRequest() 
+	{
+		if (settings.config.debug == "true")
+		{
+			trace("");
+			trace("Ping: " + restURL);
+		}
+		
+		restStr = null;
+		try
+		{
+			waitForResponse = true;
+			http.request(false);
+		}
+		catch (e:Error)
+		{
+			trace("Error...");
+		}
+	}
+	
+	static function requestComplete()
+	{
+		//Sys.sleep(intervalTime);
+		//makeRequest();
+		waitForResponse = false;
+	}
+	
+	static function onPingData(data:String) 
+	{
+		restStr = data;
+		if (restStr != null && restStr != "" && restStr.indexOf('{"success":true')!=-1 )
 		{
 			if (settings.config.debug=="true")
-				trace(restURL);
+				trace("Response - got data: " + data);
 				
-			var restStr = Http.requestUrl(restURL);
-			if (restStr != null && restStr != "")
+			jsonPing = Json.parse(restStr);
+			var success = jsonPing.success;
+			if (success == "true")
 			{
-				jsonPing = Json.parse(restStr);
-				var success = jsonPing.success;
-				if (success == "true")
+				var command = jsonPing.callback;
+				parseCommand(command);
+				
+				if (launch == null)
 				{
-					var command = jsonPing.callback;
-					parseCommand(command);
-					
-					if (launch == null)
-					{
-						if (jsonPing.launch!=null && jsonPing.launch!="")
-							launch = jsonPing.launch;
-							
-						runProcess(launch);
-					}
-					if (!ipIsSent)
-					{
-						restURL = restURLBase;
-						ipIsSent = true;
-					}
+					if (jsonPing.launch!=null && jsonPing.launch!="")
+						launch = jsonPing.launch;
+						
+					runProcess(launch);
 				}
-				else
+				if (!ipIsSent)
 				{
-					trace("Error: ClientID " + restID + " not found! ");
+					restURL = restURLBase;
+					ipIsSent = true;
 				}
 			}
-			Sys.sleep(intervalTime);
+			else
+			{
+				trace("Error: ClientID " + restID + " not found! ");
+			}
+			requestComplete();
 		}
+		else
+			onPingCorruptData(data);			
+	}
+	
+	static function onPingError(error) 
+	{
+		if (settings.config.debug=="true")
+			trace("Response - error: "+ error);
+		// no valid data...
+		
+		Sys.sleep(10);
+		requestComplete();
+	}
+	
+	static function onPingCorruptData(data) 
+	{
+		if (settings.config.debug=="true")
+			trace("Response - not valid response data: "+ data);
+		// no valid data...
+		Sys.sleep(10);
+		requestComplete();
 	}
 	
 	static function parseCommand(cmd:String) 
@@ -161,6 +281,47 @@ class Main
 			firstCommand = cmd;
 	}
 
+	/////////////////////////////////////////////////////////////////////////////////////
+	
+	static function onCrash() 
+	{
+		var stack:Array<StackItem> = CallStack.callStack();
+		if (stack != null)
+		{
+			stack.shift(); //Remove crash handler entry
+			stack.shift(); //Remove crash handler entry
+			stack.reverse(); //Top down
+			
+			var stackDump = "Exception! (" + Date.now().toString() + ")\n:::::::::::::::::::::::::::::::::::::::::::::::" + CallStack.toString(stack) + "\n";
+			
+			//if (!FileSystem.exists("log.txt"))
+			try
+			{
+				var output:FileOutput = sys.io.File.append("log.txt", false);
+				output.writeString(stackDump+"\n");
+				output.close();
+			}
+			catch (e:Error)
+			{
+				trace("Could not write to log!");
+				trace(stackDump);
+			}
+		}
+		
+		if (settings.config.debug=="true")
+			trace("Exception occured. Restarting client");
+		
+		if (restartAutomatic == "false")
+		{
+		}
+		else
+		{
+			Sys.sleep(10);
+			runProcess("KontentumClient.exe",true);
+			Sys.exit(1);
+		}
+	}
+	
 	/////////////////////////////////////////////////////////////////////////////////////
 
 	static function SystemReboot() 
@@ -194,13 +355,29 @@ class Main
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////
+	
+/*	static function getSafe(path:String,type:Any):Any
+	{
+		if (path == null)
+			return null;
+			
+		var pSplit:Array<String> = path.split(".");
+		if (pSplit == null || pSplit.length == 0)
+			retun null;
+			
+	}
+*/	
+	/////////////////////////////////////////////////////////////////////////////////////
 	//===================================================================================
 	// Utils
 	//-----------------------------------------------------------------------------------
 	
-	static function runProcess(exeName:String)
+	static function runProcess(exeName:String, hidden:Bool=false)
 	{
-		untyped __cpp__('WinExec(exeName, SW_SHOW)');
+		if (!hidden)
+			untyped __cpp__('WinExec(exeName, SW_SHOW)');
+		else
+			untyped __cpp__('WinExec(exeName, SW_HIDE)');
 	}
 		
 	static function fromXML(xml:Xml):Dynamic
