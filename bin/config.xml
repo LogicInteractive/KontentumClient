@@ -9,6 +9,6 @@
 		<delay>0.0</delay>
 	</kontentum>
 	<killexplorer>false</killexplorer> 
-	<debug>false</debug> 
+	<debug>true</debug> 
 	<restartAutomatic>true</restartAutomatic> 
 </config>
