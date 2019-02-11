@@ -15,6 +15,7 @@ import haxe.Json;
 import haxe.Timer;
 import haxe.io.Output;
 import haxe.macro.Expr.Error;
+import no.logic.nativelibs.windows.SystemUtils;
 import sys.FileSystem;
 import sys.io.File;
 import sys.io.FileOutput;
@@ -250,6 +251,12 @@ class KontentumClient
 				trace("Response - got data: " + restStr);
 				
 			jsonPing = response.toJson();
+			if (jsonPing == null)
+			{
+				onPingCorruptData(response);	
+				return;
+			}
+			
 			var success = jsonPing.success;
 			if (success == "true")
 			{

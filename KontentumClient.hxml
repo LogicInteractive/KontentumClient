@@ -1,0 +1,6 @@
+-cp src
+-cpp bin
+-main Main
+-lib akifox-asynchttp
+-D HXCPP_STACK_TRACE
+-D HXCPP_STACK_LINE

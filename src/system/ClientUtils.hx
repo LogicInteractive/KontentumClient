@@ -35,9 +35,11 @@ typedef NetworkAdapterInfo =
 #include <winsock2.h>
 #include <iostream>
 #include <stdio.h>
+#include <string.h>
 #include <Windows.h>
 #include <Iphlpapi.h>
 #pragma comment(lib, "iphlpapi.lib")
+
 ')
 class ClientUtils 
 {

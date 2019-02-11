@@ -1,6 +1,8 @@
 package;
 
 import client.KontentumClient;
+import client.SubProcess;
+import system.ClientUtils;
 
 /**
  * ...
@@ -19,7 +21,12 @@ class Main
 
 	static function main() 
 	{
-		client = new KontentumClient("config.xml");
+		//client = new KontentumClient("config.xml");
+		
+		var c = new SubProcess("C:/Windows/System32/notepad.exe");
+		c.lifeSpan = 10;
+		if (!c.run())
+			trace("process failed to start....");
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////
