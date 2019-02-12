@@ -16,7 +16,7 @@
   <!-- Other classes to be compiled into your SWF -->
   <classpaths>
     <class path="src" />
-    <class path="C:\dev\haxe\UIX" />
+    <class path="C:\dev\haxe\UIX.hx" />
   </classpaths>
   <!-- Build options -->
   <build>

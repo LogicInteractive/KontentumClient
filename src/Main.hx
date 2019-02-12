@@ -24,8 +24,10 @@ class Main
 		//client = new KontentumClient("config.xml");
 		
 		var c = new SubProcess("C:/Windows/System32/notepad.exe");
-		c.lifeSpan = 10;
-		if (!c.run())
+		c.lifeSpan = 1;
+		var success = c.run();
+		
+		if (!success)
 			trace("process failed to start....");
 	}
 	
