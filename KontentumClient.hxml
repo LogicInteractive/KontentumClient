@@ -1,4 +1,5 @@
 -cp src
+-cp C:/dev/haxe/UIX.hx
 -cpp bin
 -main Main
 -lib akifox-asynchttp

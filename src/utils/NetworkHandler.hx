@@ -1,4 +1,4 @@
-package client;
+package utils;
 
 import com.akifox.asynchttp.HttpRequest;
 import com.akifox.asynchttp.HttpResponse;
@@ -19,8 +19,8 @@ import no.logic.nativelibs.windows.SystemUtils;
 import sys.FileSystem;
 import sys.io.File;
 import sys.io.FileOutput;
-import system.ClientUtils;
-import system.CrashHandler;
+import utils.ClientUtils;
+import utils.CrashHandler;
 
 /**
  * ...
@@ -45,7 +45,6 @@ class NetworkHandler
 	var restURL					: String;
 	var restURLBase				: String;
 	var ipIsSent				: Bool;
-	public var intervalTime			: Float			= 1.0;
 	var firstCommand			: String;
 	var launch					: String;
 	var localIP					: String;
@@ -57,6 +56,10 @@ class NetworkHandler
 	var pingTimer				: Timer;
 	
 	var httpRequest				: HttpRequest;
+	
+	public var intervalTime		: Float				= 1.0;
+	
+	var settings				: Dynamic;
 	
 	//===================================================================================
 	// ClientFunctions 
@@ -72,6 +75,7 @@ class NetworkHandler
 
 	public function init(settings:Dynamic) 
 	{
+		this.settings = settings;
 		intervalTime = Std.parseFloat(settings.config.kontentum.interval);
 		
 		token = settings.config.kontentum.token;
@@ -84,7 +88,7 @@ class NetworkHandler
 		
 		if (restIP == null || restAPI == null || restID == null)
 		{
-			trace("Malformed config xml! Exiting.");
+			ClientUtils.debug("Malformed config xml! Exiting.");
 			Sys.exit(1);			
 		}
 		
@@ -96,7 +100,7 @@ class NetworkHandler
 		var adapter = ClientUtils.getNetworkAdapterInfo( ClientUtils.ADAPTER_TYPE_ANY );
 		if (adapter.ip == "0.0.0.0")
 		{
-			trace("Network adapter not found!");
+			ClientUtils.debug("Network adapter not found!");
 			Timer.delay(startNet, 5000);
 		}
 		else
@@ -104,6 +108,7 @@ class NetworkHandler
 			restURL = restURLBase + "/" +  StringTools.urlEncode(adapter.ip) + "/" + StringTools.urlEncode(adapter.mac) + "/" + StringTools.urlEncode(adapter.hostname);
 			httpRequest = new HttpRequest( { url:restURL, callback:onHttpResponse });
 			
+			ClientUtils.debug("REST: "+ restURL);
 			createTimer();
 		}
 	}
@@ -125,8 +130,6 @@ class NetworkHandler
 
 	function makeRequest() 
 	{
-		AppUtils.d
-		
 		restStr = null;
 		try
 		{
@@ -138,7 +141,7 @@ class NetworkHandler
 		}
 		catch (e:Error)
 		{
-			trace("Error...");
+			ClientUtils.debug("Request error..");
 		}
 	}
 	
@@ -168,8 +171,8 @@ class NetworkHandler
 		restStr = response.toText();
 		if (restStr != null && restStr != "" && restStr.indexOf('{"success":true')!=-1 )
 		{
-			if (settings.config.debug=="true")
-				trace("Response - got data: " + restStr);
+			if (settings.config.debug == "true")
+				ClientUtils.debug("Response : " + restStr);
 				
 			jsonPing = response.toJson();
 			if (jsonPing == null)
@@ -182,14 +185,14 @@ class NetworkHandler
 			if (success == "true")
 			{
 				var command = jsonPing.callback;
-				parseCommand(command);
+				ClientUtils.parseCommand(command);
 				
 				if (launch == null)
 				{
 					if (jsonPing.launch!=null && jsonPing.launch!="")
 						launch = jsonPing.launch;
 						
-					ClientUtils.runProcess(launch);
+					ClientUtils.setPersistentProcess(launch);
 				}
 				if (!ipIsSent)
 				{
@@ -199,7 +202,7 @@ class NetworkHandler
 			}
 			else
 			{
-				trace("Error: ClientID " + restID + " not found! ");
+				ClientUtils.debug("Error: ClientID " + restID + " not found! ");
 			}
 			checkAttributes();
 			requestComplete();
@@ -217,7 +220,7 @@ class NetworkHandler
 				if (jsonPing.ping != intervalTime)
 				{
 					if (settings.config.debug=="true")
-						trace("Changing ping time to : " + jsonPing.ping);
+						ClientUtils.debug("Changing ping time to : " + jsonPing.ping);
 					
 					intervalTime = jsonPing.ping;
 					createTimer();
@@ -229,7 +232,7 @@ class NetworkHandler
 	function onPingError(response:HttpResponse) 
 	{
 		if (settings.config.debug=="true")
-			trace("Response - error: "+ response.status + " " + response.error);
+			ClientUtils.debug("Response - error: "+ response.status + " " + response.error);
 		// no valid data...
 		
 		Sys.sleep(10);
@@ -239,7 +242,7 @@ class NetworkHandler
 	function onPingCorruptData(response:HttpResponse) 
 	{
 		if (settings.config.debug=="true")
-			trace("Response - not valid response data: "+ response.status + " " + response.content);
+			ClientUtils.debug("Response - not valid response data: "+ response.status + " " + response.content);
 		// no valid data...
 		Sys.sleep(10);
 		requestComplete();

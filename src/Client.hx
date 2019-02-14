@@ -1,36 +1,18 @@
-package client;
+package;
 
-import com.akifox.asynchttp.HttpRequest;
-import com.akifox.asynchttp.HttpResponse;
-import cpp.Char;
-import cpp.ConstCharStar;
-import cpp.ConstPointer;
-import cpp.Lib;
-import cpp.NativeString;
-import cpp.RawConstPointer;
-import cpp.vm.Thread;
-import haxe.CallStack;
-import haxe.Http;
-import haxe.Json;
-import haxe.Timer;
-import haxe.io.Output;
-import haxe.macro.Expr.Error;
-import no.logic.nativelibs.windows.SystemUtils;
-import sys.FileSystem;
-import sys.io.File;
-import sys.io.FileOutput;
-import system.ClientUtils;
-import system.CrashHandler;
+import utils.ClientUtils;
+import utils.CrashHandler;
+import utils.NetworkHandler;
 
 /**
  * ...
  * @author Tommy S.
  */
 
-@:cppFileCode('
-#include <Windows.h>
-')
-class KontentumClient 
+//@:cppFileCode('
+//#include <Windows.h>
+//')
+class Client 
 {
 	/////////////////////////////////////////////////////////////////////////////////////
 	
@@ -44,11 +26,10 @@ class KontentumClient
 	
 	public function new(configXml:String) 
 	{
-		var appUtils = AppUtils();
-		settings = appUtils.loadSettings(configXml);
+		settings = ClientUtils.loadSettings(configXml);
 		
-		if (settings.config.debug!="true")
-			untyped __cpp__('FreeConsole();');
+		if (settings.config.debug!=true)
+			ClientUtils.freeConsole();
 			
 		var networkHandler = new NetworkHandler();
 		networkHandler.init(settings);
@@ -76,8 +57,20 @@ class KontentumClient
 		if (delayTime > 0)
 			Sys.sleep(delayTime);
 			
-		networkHandler.intervalTime = 
+		networkHandler.intervalTime = settings.config.kontentum.interval;
 		networkHandler.startNet();
+	}
+	
+	/////////////////////////////////////////////////////////////////////////////////////
+
+	static public function subprocessDidCrash() 
+	{
+		ClientUtils.debug("Subprocess crashes. Restarting.");
+	}
+	
+	static public function subprocessDidExit() 
+	{
+		ClientUtils.debug("Subprocess exited. Restarting.");
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////

@@ -1,7 +1,8 @@
-package client;
+package utils;
+
 import haxe.Timer;
 import no.logic.nativelibs.windows.SystemUtils;
-import system.ClientUtils;
+import utils.ClientUtils;
 
 /**
  * ...
@@ -21,7 +22,8 @@ class SubProcess
 	public var waitForProcessToFinish			: Bool			= false;
 	public var isAlive							: Bool			= false;
 	
-	public var relaunchIfCrash					: Bool			= true;
+	public var restartIfCrash					: Bool			= true;
+	public var restartIfExit					: Bool			= true;
 	public var lifeSpan							: Float			= -1;
 	public var monitor							: Bool			= true;
 	public var waitForStart						: Bool			= false;
@@ -119,10 +121,12 @@ class SubProcess
 			}
 			else if (status==0) // EXIT_SUCCESS
 			{
-				handleCrash();
+				Client.subprocessDidExit();
+				handleExit();
 			}
 			else if (status==1) // EXIT_FAILURE
 			{
+				Client.subprocessDidCrash();
 				handleCrash();
 			}
 			else // HM.....
@@ -142,9 +146,15 @@ class SubProcess
 	
 	/////////////////////////////////////////////////////////////////////////////////////
 	
+	function handleExit() 
+	{
+		if (restartIfExit)
+			restart();
+	}	
+	
 	function handleCrash() 
 	{
-		if (relaunchIfCrash)
+		if (restartIfCrash)
 			restart();
 	}
 	

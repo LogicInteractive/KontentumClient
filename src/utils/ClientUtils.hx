@@ -1,5 +1,6 @@
-package system;
+package utils;
 
+import utils.SubProcess;
 import cpp.Char;
 import cpp.ConstCharStar;
 import cpp.ConstPointer;
@@ -48,7 +49,35 @@ class ClientUtils
 	static public inline var ADAPTER_TYPE_WIFI			: Int		= 71;
 	
 	/////////////////////////////////////////////////////////////////////////////////////
+	
+	static var settings				: Dynamic;
+	static var subProcess			: SubProcess;
+	
+	static var firstCommand			: String;
+	
+	/////////////////////////////////////////////////////////////////////////////////////
 
+	//===================================================================================
+	// Load settings 
+	//-----------------------------------------------------------------------------------
+
+	static public function loadSettings(configXml:String):Dynamic
+	{
+		var configFile = "";
+		try
+		{
+			configFile = File.getContent(configXml);
+		}
+		catch (e:Error)
+		{
+			debug("Config file not found");
+			Sys.exit(1);
+		}
+		
+		settings = ClientUtils.fromXML(Xml.parse(configFile));
+		return settings;
+	}
+	
 	//===================================================================================
 	// SystemFunctions 
 	//-----------------------------------------------------------------------------------
@@ -83,6 +112,11 @@ class ClientUtils
 		Sys.command("explorer.exe");
 	}
 	
+	static public function freeConsole()
+	{
+		untyped __cpp__('FreeConsole();');
+	}
+	
 	/////////////////////////////////////////////////////////////////////////////////////
 	
 /*	static function getSafe(path:String,type:Any):Any
@@ -101,6 +135,30 @@ class ClientUtils
 	// Utils
 	//-----------------------------------------------------------------------------------
 	
+	static public function setPersistentProcess(exeName:String)
+	{
+		if (subProcess != null)
+			subProcess.terminate();
+			
+		if (Reflect.field(settings.config, "overridelaunch") != null)
+			exeName = settings.config.overridelaunch;
+			
+		subProcess = new SubProcess(exeName);
+		subProcess.launchDelay = 0;
+		subProcess.monitor = true;
+		subProcess.restartDelay = 0.0;
+		var success = subProcess.run();
+		
+		if (!success)
+			debug("process failed to start....");
+	}	
+	
+	/////////////////////////////////////////////////////////////////////////////////////
+	//===================================================================================
+	// Utils
+	//-----------------------------------------------------------------------------------
+	
+	//old
 	static public function runProcess(exeName:String, hidden:Bool=false)
 	{
 		if (!hidden)
@@ -295,5 +353,78 @@ class ClientUtils
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////
+	
+	function startCrashHandler()
+	{
+		CrashHandler.setCPPExceptionHandler(onCrash, false);
+	}
+
+	//===================================================================================
+	// CrashHandler 
+	//-----------------------------------------------------------------------------------
+	
+	function onCrash() 
+	{
+		var stack:Array<StackItem> = CallStack.callStack();
+		if (stack != null)
+		{
+			stack.shift(); //Remove crash handler entry
+			stack.shift(); //Remove crash handler entry
+			stack.reverse(); //Top down
+			
+			var stackDump = "Exception! (" + Date.now().toString() + ")\n:::::::::::::::::::::::::::::::::::::::::::::::" + CallStack.toString(stack) + "\n";
+			
+			//if (!FileSystem.exists("log.txt"))
+			try
+			{
+				var output:FileOutput = sys.io.File.append("log.txt", false);
+				output.writeString(stackDump+"\n");
+				output.close();
+			}
+			catch (e:Error)
+			{
+				debug("Could not write to log!");
+				debug(stackDump);
+			}
+		}
+		
+		if (settings.config.debug=="true")
+			debug("Exception occured. Restarting client");
+		
+		if (settings.config.restartAutomatic == "false")
+		{
+		}
+		else
+		{
+			Sys.sleep(10);
+			ClientUtils.runProcess("KontentumClient.exe",true);
+			Sys.exit(1);
+		}
+	}
+	
+	/////////////////////////////////////////////////////////////////////////////////////
+	
+	static public function debug(str:String)
+	{
+		if (settings.config.debug == true)
+			trace(str);
+	}
+	
+	static public function parseCommand(cmd:String) 
+	{
+		if (firstCommand != null)
+		{
+			switch (cmd) 
+			{
+				case "reboot":		ClientUtils.SystemReboot();
+				case "shutdown":	ClientUtils.SystemShutdown();
+			}
+		}
+		else
+			firstCommand = cmd;
+	}
+		
+	/////////////////////////////////////////////////////////////////////////////////////
+	
 }
 
