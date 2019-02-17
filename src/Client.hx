@@ -9,14 +9,11 @@ import utils.NetworkHandler;
  * @author Tommy S.
  */
 
-//@:cppFileCode('
-//#include <Windows.h>
-//')
 class Client 
 {
 	/////////////////////////////////////////////////////////////////////////////////////
 	
-	static public var settings	: Dynamic;
+	var settings				: Dynamic;
 	var restartAutomatic		: String;
 	var delayTime				: Float			= 0.0;
 	
@@ -59,18 +56,6 @@ class Client
 			
 		networkHandler.intervalTime = settings.config.kontentum.interval;
 		networkHandler.startNet();
-	}
-	
-	/////////////////////////////////////////////////////////////////////////////////////
-
-	static public function subprocessDidCrash() 
-	{
-		ClientUtils.debug("Subprocess crashes. Restarting.");
-	}
-	
-	static public function subprocessDidExit() 
-	{
-		ClientUtils.debug("Subprocess exited. Restarting.");
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////

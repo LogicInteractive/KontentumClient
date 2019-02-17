@@ -34,6 +34,9 @@ class SubProcess
 	var deathTimer								: Timer;
 	var lifePingTimer							: Timer;
 	var launchDelayTimer						: Timer;
+	
+	public var subprocessDidCrash				: Void->Void;
+	public var subprocessDidExit				: Void->Void;
 
 	//===================================================================================
 	// ClientFunctions 
@@ -103,6 +106,21 @@ class SubProcess
 		run();
 	}
 	
+	
+	/////////////////////////////////////////////////////////////////////////////////////
+	
+	public function forceQuitNoRestart()
+	{
+		isAlive = false;
+		if (launchDelayTimer != null)
+			launchDelayTimer.stop();
+			
+		if (lifePingTimer != null)
+			lifePingTimer.stop();
+			
+		terminate();
+	}
+	
 	/////////////////////////////////////////////////////////////////////////////////////
 
 	function onLifePingTrigger()
@@ -121,17 +139,20 @@ class SubProcess
 			}
 			else if (status==0) // EXIT_SUCCESS
 			{
-				Client.subprocessDidExit();
+				if (subprocessDidExit != null)
+					subprocessDidExit();
 				handleExit();
 			}
 			else if (status==1) // EXIT_FAILURE
 			{
-				Client.subprocessDidCrash();
+				if (subprocessDidCrash != null)
+					subprocessDidCrash();
 				handleCrash();
 			}
 			else // HM.....
 			{
-				handleCrash();
+				if (subprocessDidCrash != null)
+					subprocessDidCrash();
 			}
 		}
 	}
@@ -176,4 +197,3 @@ class SubProcess
 	
 	/////////////////////////////////////////////////////////////////////////////////////
 }
-

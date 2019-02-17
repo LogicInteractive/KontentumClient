@@ -7,7 +7,6 @@ import cpp.ConstPointer;
 import cpp.Lib;
 import cpp.NativeString;
 import cpp.RawConstPointer;
-import cpp.vm.Thread;
 import haxe.CallStack;
 import haxe.Http;
 import haxe.Json;
@@ -54,6 +53,7 @@ class ClientUtils
 	static var subProcess			: SubProcess;
 	
 	static var firstCommand			: String;
+	static var explorerKilled		: Bool;
 	
 	/////////////////////////////////////////////////////////////////////////////////////
 
@@ -104,12 +104,17 @@ class ClientUtils
 	
 	static public function KillExplorer() 
 	{
+		explorerKilled = true;
 		Sys.command("taskkill",["/F","/IM","explorer.exe"]);
 	}
 	
 	static public function launchExplorer() 
 	{
-		Sys.command("explorer.exe");
+		if (explorerKilled)
+		{
+			Sys.command("explorer.exe");
+			explorerKilled = false;
+		}
 	}
 	
 	static public function freeConsole()
@@ -147,12 +152,46 @@ class ClientUtils
 		subProcess.launchDelay = 0;
 		subProcess.monitor = true;
 		subProcess.restartDelay = 0.0;
+		subProcess.subprocessDidCrash = subprocessDidCrash;
+		subProcess.subprocessDidExit = subprocessDidExit;
 		var success = subProcess.run();
 		
 		if (!success)
 			debug("process failed to start....");
 	}	
 	
+	/////////////////////////////////////////////////////////////////////////////////////
+	
+	static function subprocessDidCrash() 
+	{
+		ClientUtils.debug("Subprocess crashes. Restarting.");
+		NetworkHandler.i.submitAction("APP_CRASH");
+	}
+	
+	static function subprocessDidExit() 
+	{
+		ClientUtils.debug("Subprocess exited. Restarting.");
+		//NetworkHandler.i.submitAction("APP_EXIT");
+	}	
+	
+	/////////////////////////////////////////////////////////////////////////////////////
+	
+	static function handleRestart() 
+	{
+		if (subProcess != null)
+			subProcess.restart();
+	}	
+
+	static function handleQuit() 
+	{
+		if (subProcess != null)
+		{
+			subProcess.forceQuitNoRestart();
+		}
+		launchExplorer();
+	}	
+
+
 	/////////////////////////////////////////////////////////////////////////////////////
 	//===================================================================================
 	// Utils
@@ -416,8 +455,10 @@ class ClientUtils
 		{
 			switch (cmd) 
 			{
-				case "reboot":		ClientUtils.SystemReboot();
-				case "shutdown":	ClientUtils.SystemShutdown();
+				case "reboot":		SystemReboot();
+				case "shutdown":	SystemShutdown();
+				case "restart":		handleRestart();
+				case "quit":		handleQuit();
 			}
 		}
 		else

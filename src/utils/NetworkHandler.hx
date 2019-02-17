@@ -2,13 +2,13 @@ package utils;
 
 import com.akifox.asynchttp.HttpRequest;
 import com.akifox.asynchttp.HttpResponse;
+import com.akifox.asynchttp.URL;
 import cpp.Char;
 import cpp.ConstCharStar;
 import cpp.ConstPointer;
 import cpp.Lib;
 import cpp.NativeString;
 import cpp.RawConstPointer;
-import cpp.vm.Thread;
 import haxe.CallStack;
 import haxe.Http;
 import haxe.Json;
@@ -21,6 +21,7 @@ import sys.io.File;
 import sys.io.FileOutput;
 import utils.ClientUtils;
 import utils.CrashHandler;
+import utils.NetworkHandler;
 
 /**
  * ...
@@ -34,14 +35,18 @@ class NetworkHandler
 {
 	/////////////////////////////////////////////////////////////////////////////////////
 	
+	static public var i			: NetworkHandler;
+	
+	/////////////////////////////////////////////////////////////////////////////////////
+	
 	var jsonPing				: Dynamic;
 	var timer					: Timer;
-	var thread					: Thread;
 	
 	var token					: String;
 	var restIP					: String;
 	var restAPI					: String;
 	var restID					: String;
+	var restToken				: String;
 	var restURL					: String;
 	var restURLBase				: String;
 	var ipIsSent				: Bool;
@@ -55,6 +60,7 @@ class NetworkHandler
 	var waitForResponse			: Bool;
 	var pingTimer				: Timer;
 	
+	var submitActionHttpReq		: HttpRequest;
 	var httpRequest				: HttpRequest;
 	
 	public var intervalTime		: Float				= 1.0;
@@ -67,6 +73,7 @@ class NetworkHandler
 	
 	public function new() 
 	{
+		i = this;
 	}
 	
 	//===================================================================================
@@ -82,6 +89,7 @@ class NetworkHandler
 		restIP = settings.config.kontentum.ip;
 		restAPI = settings.config.kontentum.api;
 		restID = settings.config.kontentum.clientID;
+		restToken = settings.config.kontentum.clientToken;
 		
 		if (token == null)
 			token = "_";
@@ -93,6 +101,8 @@ class NetworkHandler
 		}
 		
 		restURLBase = restIP + "/" + restAPI +"/" + restID + "/" + token;
+		
+		submitActionHttpReq = new HttpRequest( { url:restIP, callback:onSubmitActionHttpResponse });		
 	}
 	
 	public function startNet()
@@ -152,7 +162,7 @@ class NetworkHandler
 		waitForResponse = false;
 	}
 	
-	 function onHttpResponse(response:HttpResponse)
+	function onHttpResponse(response:HttpResponse)
 	{
 		if (response.isOK)
 		{
@@ -248,6 +258,29 @@ class NetworkHandler
 		requestComplete();
 	}
 
+	/////////////////////////////////////////////////////////////////////////////////////
+	
+	public function submitAction(action:String)
+	{
+		var submitURL:URL = new URL(restIP +'/rest/submitAction/' + restToken + '/' + StringTools.urlEncode(action) + '/' + StringTools.urlEncode(""));
+		submitActionHttpReq = submitActionHttpReq.clone();
+		submitActionHttpReq.url = submitURL;
+		submitActionHttpReq.timeout = 20;
+		submitActionHttpReq.send();
+		
+		ClientUtils.debug("Submit action: " + submitURL);
+	}
+	
+	function onSubmitActionHttpResponse(response:HttpResponse)
+	{
+		if (response.isOK)
+		{
+			ClientUtils.debug("Submit action: " + response.content);
+		}
+		else
+			ClientUtils.debug("Submit action error: "+response.error);
+	}  
+	
 	/////////////////////////////////////////////////////////////////////////////////////
 }
 
