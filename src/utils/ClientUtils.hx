@@ -84,6 +84,9 @@ class ClientUtils
 	
 	static public function SystemReboot() 
 	{
+		if (subProcess!=null)
+			subProcess.forceQuitNoRestart();
+			
 		//#if win
 		//trace("REBOOT");
 		Sys.command("shutdown", ["/r", "/f", "/t", "0"]);
@@ -94,6 +97,9 @@ class ClientUtils
 	
 	static public function SystemShutdown() 
 	{
+		if (subProcess!=null)
+			subProcess.forceQuitNoRestart();
+
 		//#if win
 		//trace("SHUTDOWN");
 		Sys.command("shutdown",["/s","/f","/t","0"]);
@@ -151,7 +157,7 @@ class ClientUtils
 		subProcess = new SubProcess(exeName);
 		subProcess.launchDelay = 0;
 		subProcess.monitor = true;
-		subProcess.restartDelay = 0.0;
+		subProcess.restartDelay = Std.parseFloat(settings.config.kontentum.restartdelay);
 		subProcess.subprocessDidCrash = subprocessDidCrash;
 		subProcess.subprocessDidExit = subprocessDidExit;
 		var success = subProcess.run();
@@ -206,141 +212,6 @@ class ClientUtils
 			untyped __cpp__('WinExec(exeName, SW_HIDE)');
 	}
 		
-	static public function fromXML(xml:Xml):Dynamic
-	{
-		var o:Dynamic = {};
-		if (xml != null)
-		{
-			iterateXMLNode(o, xml);
-		}
-		return o;
-	}
-	
-	static function iterateXMLNode(o:Dynamic, xml:Xml) 
-	{
-		for ( node in xml.elements() )
-		{
-			if (node!=null)
-			{	
-				var nodeChildren = 0;
-				for ( nc in node.elements() )
-					nodeChildren++;
-					
-				if (nodeChildren>0)
-				{
-					Reflect.setField(o, node.nodeName, {});
-					iterateXMLNode(Reflect.field(o, node.nodeName), node);
-				}
-				else
-					Reflect.setField(o, node.nodeName, returnTyped(Std.string(node.firstChild())));
-			}
-		}		
-	}
-	
-	static public function returnTyped(d:String):Dynamic
-	{
-		if (d == null)
-			return d;
-			
-		if (isStringBool(d))
-			return toBool(d);
-		else if (isStringInt(d))
-			return Std.parseInt(d);
-		else if (isStringInt(d))
-			return Std.parseFloat(d);
-		else
-			return Std.string(d);
-	}
-	
-	static public function isStringBool(inp:String):Bool
-	{
-		if (inp == null)
-			return false;
-			
-		inp.split(" ").join(""); // strip spaces
-			
-		if ((inp.toLowerCase() == "true") || (inp.toLowerCase() == "false"))
-			return true;
-		else
-			return false;
-	}	
-		
-	static public function toBool( value:Dynamic ):Bool
-	{
-		var isBoolean:Bool = false;
-		var strVal:String = Std.string(value);
-		
-		switch ( strVal.toLowerCase() )
-		{
-			case "1":
-				isBoolean = true;
-			case "true":
-				isBoolean = true;
-			case "yes":
-				isBoolean = true;
-			case "y":
-				isBoolean = true;
-			case "on":
-				isBoolean = true;
-			case "enabled":
-				isBoolean = true;
-		}
-
-		return isBoolean;
-	}
-	
-	static public function isStringInt(inp:String):Bool
-	{
-		if (inp == null || inp.indexOf(".")!=-1)
-			return false;
-			
-		inp.split(" ").join(""); // strip spaces
-		for (i in 0...inp.length) 
-		{
-			if (!isfirstCharNumber(inp.substr(i, 1)))
-				return false;
-		}
-		return true;
-	}
-	
-	static public function isfirstCharNumber(char:String):Bool
-	{
-		if (char==null || char.length<1)
-			return false;
-			
-		var isNumber = false;
-		var fc = char.substr(0, 1);
-		switch (fc) 
-		{
-			case "0":
-				isNumber = true;
-			case "1":
-				isNumber = true;
-			case "2":
-				isNumber = true;
-			case "3":
-				isNumber = true;
-			case "4":
-				isNumber = true;
-			case "5":
-				isNumber = true;
-			case "6":
-				isNumber = true;
-			case "7":
-				isNumber = true;
-			case "8":
-				isNumber = true;
-			case "9":
-				isNumber = true;
-			default:
-				isNumber = false;
-		}
-		
-		return isNumber;
-	}
-	
-	/////////////////////////////////////////////////////////////////////////////////////
-	
 	static public function getNetworkAdapterInfo(adaptertype:Int):NetworkAdapterInfo
 	{
 		var ip:ConstPointer<Char> = null;

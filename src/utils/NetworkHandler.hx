@@ -162,7 +162,8 @@ class NetworkHandler
 		waitForResponse = false;
 	}
 	
-	function onHttpResponse(response:HttpResponse)
+	function onHttpResponse(response:Ht
+	tpResponse)
 	{
 		if (response.isOK)
 		{

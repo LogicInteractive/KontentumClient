@@ -7,9 +7,10 @@
 		<token />
 		<interval>1.0</interval>
 		<delay>0.0</delay>
+		<restartdelay>3.0</restartdelay>
 	</kontentum>
 	<killexplorer>false</killexplorer> 
 	<debug>true</debug> 
 	<restartAutomatic>true</restartAutomatic> 
-	<overridelaunch>c:/Windows/System32/notepad.exe</overridelaunch> 
+	<overridelaunch></overridelaunch> 
 </config>
