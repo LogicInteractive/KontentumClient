@@ -24,13 +24,13 @@ class Client
 	public function new(configXml:String) 
 	{
 		settings = ClientUtils.loadSettings(configXml);
-		
+
 		if (settings.config.debug!=true)
 			ClientUtils.freeConsole();
 			
 		var networkHandler = new NetworkHandler();
 		networkHandler.init(settings);
-		
+
 		if (settings.config.killexplorer == "true")
 			ClientUtils.KillExplorer();
 		

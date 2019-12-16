@@ -1,0 +1,19 @@
+{
+	"version": "0.2.0",
+	"configurations": [
+		{
+            "name": "C++ (debug)",
+            "type": "hxcpp",
+			"request": "launch",
+			"preLaunchTask": "Build C++ (debug)",
+            "program": "${workspaceFolder}/bin/KontentumClient-debug.exe"
+		},
+		{
+            "name": "C++ (release)",
+            "type": "hxcpp",
+			"request": "launch",
+			"preLaunchTask": "Build C++ (release)",
+            "program": "${workspaceFolder}/bin/KontentumClient.exe"
+        }		
+	]
+}

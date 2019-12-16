@@ -1,0 +1,18 @@
+{
+  "haxe.displayServer": {
+    "arguments": [
+      "-v"
+    ]
+  },
+  "haxe.executable": "C:\\HaxeToolkitV4\\haxe\\haxe.exe",
+  "haxe.displayPort": "auto",
+  "haxe.enableCompilationServer": true,
+  "files.exclude": {
+    "__error": true,
+    "KontentumNC.hxproj": true,
+    ".gitignore": true,
+    "KontentumClient.hxproj": true
+  },
+  "terminal.integrated.fontWeightBold": "normal",
+  "editor.fontWeight": "100"
+}

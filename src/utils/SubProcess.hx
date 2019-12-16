@@ -101,9 +101,9 @@ class SubProcess
 	
 	public function restart()
 	{
-		launchDelay = restartDelay;
+/*		launchDelay = restartDelay;
 		terminate();
-		run();
+		run();*/
 	}
 	
 	
@@ -143,7 +143,7 @@ class SubProcess
 					subprocessDidExit();
 				handleExit();
 			}
-			else if (status==1) // EXIT_FAILURE
+/*			else if (status==1) // EXIT_FAILURE
 			{
 				if (subprocessDidCrash != null)
 					subprocessDidCrash();
@@ -153,7 +153,7 @@ class SubProcess
 			{
 				if (subprocessDidCrash != null)
 					subprocessDidCrash();
-			}
+			}*/
 		}
 	}
 	
