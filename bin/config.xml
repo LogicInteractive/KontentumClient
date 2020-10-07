@@ -2,8 +2,8 @@
 	<kontentum>
 		<ip>https://kontentum.link</ip>
 		<api>rest/pingClient</api> 
-		<clientID>277</clientID> 
-		<exhibitToken>jttuqu</exhibitToken> 
+		<clientID>341</clientID> 
+		<exhibitToken>71n54v</exhibitToken> 
 		<token />
 		<interval>1.0</interval>
 		<delay>0.0</delay>
@@ -13,4 +13,5 @@
 	<debug>true</debug> 
 	<restartAutomatic>true</restartAutomatic> 
 	<overridelaunch></overridelaunch> 
+	<chrome>C:/Program Files/Google/Chrome/Application/Chrome.exe</chrome> 
 </config>

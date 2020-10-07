@@ -3,6 +3,7 @@ package;
 import client.Network;
 import haxe.macro.Expr.Catch;
 import hxbitmini.CompileTime;
+import no.logic.fox.hwintegration.windows.Chrome;
 import no.logic.fox.loader.Loader;
 import no.logic.fox.utils.ObjUtils;
 import utils.WindowsUtils;
@@ -22,6 +23,7 @@ class KontentumClient
 
 	var waitDelay					: Float				= 0.0;
 	static var firstCommand			: String;
+	static var chrome				: Chrome;
 
 	/////////////////////////////////////////////////////////////////////////////////////
 	
@@ -113,6 +115,7 @@ class KontentumClient
 				case SystemCommand.shutdown:	WindowsUtils.systemShutdown();
 				case SystemCommand.restart:		WindowsUtils.handleRestart();
 				case SystemCommand.quit:		WindowsUtils.handleQuit();
+
 			}
 		}
 		else
@@ -138,6 +141,16 @@ class KontentumClient
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////
+
+	static public function launchChrome(url:String)
+	{
+		if (chrome==null)
+			chrome = Chrome.launch(url,config.chrome);
+		else
+			chrome.open(url);
+	}
+
+	/////////////////////////////////////////////////////////////////////////////////////
 }
 
 typedef ConfigXML =
@@ -147,6 +160,7 @@ typedef ConfigXML =
 	var debug				: Bool;
 	var restartAutomatic	: Bool;
 	var overridelaunch		: String;
+	var chrome				: String;
 }
 
 typedef KontentumConfig =

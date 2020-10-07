@@ -178,7 +178,10 @@ class Network
 					if (jsonPing.launch!=null && jsonPing.launch!="")
 						launch = jsonPing.launch;
 						
-					WindowsUtils.setPersistentProcess(launch);
+					if (isWeb(launch))
+						KontentumClient.launchChrome(launch);
+					else 
+						WindowsUtils.setPersistentProcess(launch);
 				}
 				if (!ipIsSent)
 				{
@@ -258,6 +261,13 @@ class Network
 			trace("Submit action error: "+response.error);
 	}  
 	
+	/////////////////////////////////////////////////////////////////////////////////////
+
+	inline function isWeb(path:String):Bool
+	{
+		return (path!=null && (path.indexOf("http://")!=-1 || path.indexOf("https://")!=-1));
+	}
+
 	/////////////////////////////////////////////////////////////////////////////////////
 
 }

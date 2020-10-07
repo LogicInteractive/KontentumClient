@@ -13,6 +13,7 @@ import haxe.Json;
 import haxe.Timer;
 import haxe.io.Output;
 import haxe.macro.Expr.Error;
+import no.logic.fox.hwintegration.windows.Chrome;
 import sys.FileSystem;
 import sys.io.File;
 import sys.io.FileOutput;
@@ -160,6 +161,9 @@ class WindowsUtils
 		{
 			subProcess.forceQuitNoRestart();
 		}
+		if (Chrome.isRunning)
+			Chrome.kill();
+			
 		launchExplorer();
 	}	
 
