@@ -1,5 +1,5 @@
 @echo off
-cd bin
+cd build
 if "%1"=="debug" (
   :: run debug
   Main-Debug.exe

@@ -1,8 +1,7 @@
 package utils;
 
 import haxe.Timer;
-import no.logic.nativelibs.windows.SystemUtils;
-import utils.ClientUtils;
+import no.logic.fox.hwintegration.windows.WindowsSystemUtils;
 
 /**
  * ...
@@ -68,7 +67,7 @@ class SubProcess
 	function processLaunch():Bool
 	{
 		waitForStart = false;
-		currentProcessID = SystemUtils.createProcess(launchPath);	
+		currentProcessID = WindowsSystemUtils.createProcess(launchPath);	
 		if (currentProcessID == 0)
 			return false;
 		
@@ -96,7 +95,7 @@ class SubProcess
 		if (deathTimer != null)
 			deathTimer.stop();
 			
-		return SystemUtils.killProcess(currentProcessID);
+		return WindowsSystemUtils.killProcess(currentProcessID);
 	}
 	
 	public function restart()
@@ -160,7 +159,7 @@ class SubProcess
 	public function checkAliveStatus():Int
 	{
 		if (currentProcessID > 0)
-			return SystemUtils.checkProcessInfo(currentProcessID);
+			return WindowsSystemUtils.checkProcessInfo(currentProcessID);
 		else
 			return -1;
 	}
