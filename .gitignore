@@ -1,9 +1,2 @@
-bin/include/
-bin/obj/
-bin/src/
-Build.xml
-HxcppConfig-19.h
-Main.exe.hash
-Main.exp
-Main.lib
-Options.txt
+bin/build/**
+bin/build/

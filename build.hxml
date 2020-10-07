@@ -1,0 +1,8 @@
+-cp src
+-main KontentumClient
+-cp c:/dev/fox/common
+-cp c:/dev/fox/thirdparty/common
+--cpp bin/build
+-D HXCPP_STACK_TRACE
+-D HXCPP_STACK_LINE
+--times
