@@ -13,5 +13,6 @@
 	<debug>true</debug> 
 	<restartAutomatic>true</restartAutomatic> 
 	<overridelaunch></overridelaunch> 
-	<chrome>C:/Program Files/Google/Chrome/Application/Chrome.exe</chrome> 
+	<chrome>C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe</chrome> 
+	<!-- <chrome>C:/Program Files/Google/Chrome/Application/Chrome.exe</chrome>  -->
 </config>
