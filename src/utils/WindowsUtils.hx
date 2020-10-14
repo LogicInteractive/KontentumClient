@@ -118,19 +118,16 @@ class WindowsUtils
 		if (subProcess != null)
 			subProcess.terminate();
 			
-		if (KontentumClient.config.overridelaunch!=null)
-		{
-			subProcess = new SubProcess(KontentumClient.config.overridelaunch);
-			subProcess.launchDelay = 0;
-			subProcess.monitor = true;
-			subProcess.restartDelay = KontentumClient.config.kontentum.restartdelay;
-			subProcess.subprocessDidCrash = subprocessDidCrash;
-			subProcess.subprocessDidExit = subprocessDidExit;
-			var success = subProcess.run();
-			
-			if (!success)
-				trace("process failed to start....");
-		}	
+		subProcess = new SubProcess(exeName);
+		subProcess.launchDelay = 0;
+		subProcess.monitor = KontentumClient.config.appMonitor;
+		subProcess.restartDelay = KontentumClient.config.kontentum.restartdelay;
+		subProcess.subprocessDidCrash = subprocessDidCrash;
+		subProcess.subprocessDidExit = subprocessDidExit;
+		var success = subProcess.run();
+		
+		if (!success)
+			trace("process failed to start....");
 	}	
 	
 	/////////////////////////////////////////////////////////////////////////////////////

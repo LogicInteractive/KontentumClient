@@ -97,7 +97,7 @@ class KontentumClient
 		
 		if (config.kontentum.interval == 0)
 			config.kontentum.interval = 15;
-			
+
 		if (config.kontentum.delay > 0)
 			Sys.sleep(config.kontentum.delay);	 
 
@@ -159,6 +159,7 @@ typedef ConfigXML =
 	var killexplorer		: Bool;
 	var debug				: Bool;
 	var restartAutomatic	: Bool;
+	var appMonitor			: Bool;
 	var overridelaunch		: String;
 	var chrome				: String;
 }

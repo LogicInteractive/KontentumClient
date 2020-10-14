@@ -2,10 +2,10 @@
 	<kontentum>
 		<ip>https://kontentum.link</ip>
 		<api>rest/pingClient</api> 
-		<clientID>341</clientID> 
-		<exhibitToken>71n54v</exhibitToken> 
+		<clientID>347</clientID> 
+		<exhibitToken>k9ciyl</exhibitToken> 
 		<token />
-		<interval>1.0</interval>
+		<interval>10.0</interval>
 		<delay>0.0</delay>
 		<restartdelay>3.0</restartdelay>
 	</kontentum>
@@ -13,6 +13,6 @@
 	<debug>true</debug> 
 	<restartAutomatic>true</restartAutomatic> 
 	<overridelaunch></overridelaunch> 
-	<chrome>C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe</chrome> 
-	<!-- <chrome>C:/Program Files/Google/Chrome/Application/Chrome.exe</chrome>  -->
+	<appMonitor>false</appMonitor>
+	<!-- <chrome>C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe</chrome>  -->
 </config>

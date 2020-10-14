@@ -178,9 +178,12 @@ class Network
 					if (jsonPing.launch!=null && jsonPing.launch!="")
 						launch = jsonPing.launch;
 						
+					if (KontentumClient.config.overridelaunch!=null)
+						launch = KontentumClient.config.overridelaunch;
+
 					if (isWeb(launch))
 						KontentumClient.launchChrome(launch);
-					else 
+					else
 						WindowsUtils.setPersistentProcess(launch);
 				}
 				if (!ipIsSent)
