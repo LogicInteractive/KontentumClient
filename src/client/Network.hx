@@ -81,7 +81,7 @@ class Network
 	
 	public function startNet()
 	{
-		var adapter = WindowsUtils.getNetworkAdapterInfo( WindowsUtils.ADAPTER_TYPE_ANY );
+ 		var adapter = WindowsUtils.getNetworkAdapterInfo( WindowsUtils.ADAPTER_TYPE_ANY );
 		if (adapter.ip == "0.0.0.0")
 		{
 			trace("Network adapter not found!");
@@ -93,6 +93,7 @@ class Network
 			httpRequest = new HttpRequest( { url:restURL, callback:onHttpResponse, callbackError:onHttpError });
 			// trace("REST: "+ restURL);
 			createTimer();
+			makeRequest();
 		}
 	}
 	
@@ -265,6 +266,7 @@ class Network
 				trace("Failed to get offline launch cache");
 			}
 
+			trace("No connection, launching offline: "+launch);
 			if (launch!=null && launch!="")
 			{
 				if (isWeb(launch))
@@ -303,7 +305,7 @@ class Network
 
 	inline function isWeb(path:String):Bool
 	{
-		return (path!=null && (path.indexOf("http://")!=-1 || path.indexOf("https://")!=-1));
+		return (path!=null && (path.indexOf("http://")!=-1 || path.indexOf("https://")!=-1 || path.indexOf("file://")!=-1) );
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////
