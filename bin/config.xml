@@ -2,8 +2,8 @@
 	<kontentum>
 		<ip>https://kontentum.link</ip>
 		<api>rest/pingClient</api> 
-		<clientID>347</clientID> 
-		<exhibitToken>k9ciyl</exhibitToken> 
+		<clientID></clientID> 
+		<exhibitToken></exhibitToken> 
 		<token />
 		<interval>10.0</interval>
 		<delay>0.0</delay>
