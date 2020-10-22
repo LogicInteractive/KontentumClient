@@ -14,5 +14,5 @@
 	<restartAutomatic>true</restartAutomatic> 
 	<overridelaunch></overridelaunch> 
 	<appMonitor>false</appMonitor>
-	<!-- <chrome>C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe</chrome>  -->
+	<chrome>C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe</chrome> 
 </config>

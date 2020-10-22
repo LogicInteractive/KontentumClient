@@ -6,6 +6,8 @@ import hxbitmini.CompileTime;
 import no.logic.fox.hwintegration.windows.Chrome;
 import no.logic.fox.loader.Loader;
 import no.logic.fox.utils.ObjUtils;
+import sys.FileSystem;
+import sys.io.File;
 import utils.WindowsUtils;
 
 /**
@@ -17,13 +19,15 @@ class KontentumClient
 {
 	/////////////////////////////////////////////////////////////////////////////////////
 
-	static var i					: KontentumClient;
-	static public var config		: ConfigXML;
-	static public var buildDate		: Date				= CompileTime.buildDate();
+	static var i						: KontentumClient;
+	static public var config			: ConfigXML;
+	static public var buildDate			: Date				= CompileTime.buildDate();
 
-	var waitDelay					: Float				= 0.0;
-	static var firstCommand			: String;
-	static var chrome				: Chrome;
+	var waitDelay						: Float				= 0.0;
+	static var firstCommand				: String;
+	static var chrome					: Chrome;
+
+	static public var offlineLaunchFile	: String			= "c:/temp/kontentum_offlinelaunch";
 
 	/////////////////////////////////////////////////////////////////////////////////////
 	
@@ -148,6 +152,20 @@ class KontentumClient
 			chrome = Chrome.launch(url,config.chrome);
 		else
 			chrome.open(url);
+	}
+
+	static public function cacheLaunchFile(file:String)
+	{
+		if (file==null || file=="")
+			return;
+		try 
+		{
+			File.saveContent(offlineLaunchFile,file);
+		}
+		catch(e:Dynamic)
+		{
+			trace("Failed to save offline launch file");
+		}
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////

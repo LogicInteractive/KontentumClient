@@ -33,35 +33,37 @@ class Network
 {
 	/////////////////////////////////////////////////////////////////////////////////////
 	
-	static public var i			: Network;
+	static public var i				: Network;
 	
 	/////////////////////////////////////////////////////////////////////////////////////
 	
-	var jsonPing				: JSONPingData;
-	var timer					: Timer;
+	var jsonPing					: JSONPingData;
+	var timer						: Timer;
 	
-	var token					: String;
-	var restIP					: String;
-	var restAPI					: String;
-	var restID					: String;
-	var restToken				: String;
-	var restURL					: String;
-	var restURLBase				: String;
-	var ipIsSent				: Bool;
-	var firstCommand			: String;
-	var launch					: String;
-	var localIP					: String;
-	var localMAC				: String;
+	var token						: String;
+	var restIP						: String;
+	var restAPI						: String;
+	var restID						: String;
+	var restToken					: String;
+	var restURL						: String;
+	var restURLBase					: String;
+	var ipIsSent					: Bool;
+	var firstCommand				: String;
+	var launch						: String;
+	var localIP						: String;
+	var localMAC					: String;
 
-	var http					: Http;
-	var restStr					: String;
-	var waitForResponse			: Bool;
-	var pingTimer				: Timer;
+	var http						: Http;
+	var restStr						: String;
+	var waitForResponse				: Bool;
+	var pingTimer					: Timer;
 	
-	var submitActionHttpReq		: HttpRequest;
-	var httpRequest				: HttpRequest;
+	var submitActionHttpReq			: HttpRequest;
+	var httpRequest					: HttpRequest;
 	
-	var c						: ConfigXML;
+	var c							: ConfigXML;
+
+	/////////////////////////////////////////////////////////////////////////////////////
 
 	static public function init()
 	{
@@ -88,8 +90,7 @@ class Network
 		else
 		{
 			restURL = restURLBase + "/" +  StringTools.urlEncode(adapter.ip) + "/" + StringTools.urlEncode(adapter.mac) + "/" + StringTools.urlEncode(adapter.hostname) + "/" + StringTools.urlEncode(KontentumClient.buildDate.toString());
-			httpRequest = new HttpRequest( { url:restURL, callback:onHttpResponse });
-			
+			httpRequest = new HttpRequest( { url:restURL, callback:onHttpResponse, callbackError:onHttpError });
 			// trace("REST: "+ restURL);
 			createTimer();
 		}
@@ -180,6 +181,8 @@ class Network
 						
 					if (KontentumClient.config.overridelaunch!=null)
 						launch = KontentumClient.config.overridelaunch;
+					else 
+						KontentumClient.cacheLaunchFile(launch);
 
 					if (isWeb(launch))
 						KontentumClient.launchChrome(launch);
@@ -240,6 +243,38 @@ class Network
 		Sys.sleep(10);
 		requestComplete();
 	}
+
+	function onHttpError(response:HttpResponse) 
+	{
+		trace("HTTP error: "+response.toString());
+
+		if (launch == null)
+			launchOffline();
+	}
+
+	function launchOffline()
+	{
+		if (FileSystem.exists(KontentumClient.offlineLaunchFile))
+		{
+			try 
+			{
+				launch = File.getContent(KontentumClient.offlineLaunchFile);
+			}
+			catch(e:Dynamic)
+			{
+				trace("Failed to get offline launch cache");
+			}
+
+			if (launch!=null && launch!="")
+			{
+				if (isWeb(launch))
+					KontentumClient.launchChrome(launch);
+				else
+					WindowsUtils.setPersistentProcess(launch);
+			}		
+		}		
+	}		
+
 
 	/////////////////////////////////////////////////////////////////////////////////////
 
