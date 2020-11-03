@@ -213,10 +213,11 @@ class Network
 		{
 			if (Reflect.hasField(jsonPing,"ping"))
 			{
-				if (jsonPing.ping != KontentumClient.config.kontentum.interval)
+				var newPing:Float = jsonPing.ping;
+				if (newPing != KontentumClient.config.kontentum.interval)
 				{
-					trace("Changing ping time to : " + jsonPing.ping);
-					KontentumClient.config.kontentum.interval = jsonPing.ping;
+					trace("Changing ping time to : " + newPing);
+					KontentumClient.config.kontentum.interval = newPing;
 					createTimer();
 				}
 			}

@@ -115,6 +115,9 @@ class WindowsUtils
 	
 	static public function setPersistentProcess(exeName:String)
 	{
+		if (exeName==null || exeName=="")
+			return;
+
 		if (subProcess != null)
 			subProcess.terminate();
 			
