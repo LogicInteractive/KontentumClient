@@ -4,6 +4,7 @@ import client.Network;
 import haxe.macro.Expr.Catch;
 import hxbitmini.CompileTime;
 import no.logic.fox.hwintegration.windows.Chrome;
+import no.logic.fox.kontentum.Kontentum;
 import no.logic.fox.loader.Loader;
 import no.logic.fox.utils.ObjUtils;
 import sys.FileSystem;
@@ -79,8 +80,8 @@ class KontentumClient
 			KontentumClient.exitWithError();
 		}
 
-		if (config.kontentum.token==null)
-			config.kontentum.token = "_";
+		if (config.kontentum.exhibitToken==null)
+			config.kontentum.exhibitToken = "_";
 
 		if (!config.debug)
 			WindowsUtils.freeConsole();
@@ -105,6 +106,8 @@ class KontentumClient
 		if (config.kontentum.delay > 0)
 			Sys.sleep(config.kontentum.delay);	 
 
+		if (config.kontentum.download==true)
+			downloadFiles();
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////
@@ -169,6 +172,20 @@ class KontentumClient
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////
+
+	function downloadFiles()
+	{
+		var token = config.kontentum.exhibitToken;
+		Kontentum.onComplete = onKontentumReady;
+		Kontentum.connect(config.kontentum.exhibitToken,null,'c:/logic/kontentum/cache/$token',true,false,false,true);
+	}
+
+	function onKontentumReady()
+	{
+		trace("Kontenum ready! ");//+Kontentum.RESTJsonStr);
+	}
+	
+	/////////////////////////////////////////////////////////////////////////////////////
 }
 
 typedef ConfigXML =
@@ -188,8 +205,8 @@ typedef KontentumConfig =
 	var api					: String;
 	var clientID			: Int;
 	var exhibitToken		: String;
-	var token				: String;
 	var interval			: Float;
 	var delay				: Float;
 	var restartdelay		: Float;
+	var download			: Bool;
 }
