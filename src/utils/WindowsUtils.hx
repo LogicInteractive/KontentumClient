@@ -1,6 +1,6 @@
 package utils;
 
-import client.Network;
+import client.ServerCommunicator;
 import cpp.Char;
 import cpp.ConstCharStar;
 import cpp.ConstPointer;
@@ -36,7 +36,6 @@ typedef NetworkAdapterInfo =
 #include <iostream>
 #include <stdio.h>
 #include <string.h>
-#include <Windows.h>
 #include <Iphlpapi.h>
 #pragma comment(lib, "iphlpapi.lib")
 ')
@@ -92,11 +91,15 @@ class WindowsUtils
 			isExplorerKilled = false;
 		}
 	}
-	
-	static public function freeConsole()
-	{
-		untyped __cpp__('FreeConsole();');
-	}
+
+	@:native("SetConsoleTitle")
+	extern static public function setConsoleTitle(title:String):Void;
+
+	@:native("FreeConsole")
+	extern static public function freeConsole():Bool;
+
+	@:native("AllocConsole")
+	extern static public function allocConsole():Bool;
 	
 	//old
 /* 	static public function runProcess(exeName:String, hidden:Bool=false)
@@ -130,20 +133,23 @@ class WindowsUtils
 		var success = subProcess.run();
 		
 		if (!success)
-			trace("process failed to start....");
+			if (KontentumClient.debug)
+				trace("process failed to start....");
 	}	
 	
 	/////////////////////////////////////////////////////////////////////////////////////
 	
 	static function subprocessDidCrash() 
 	{
-		trace("Subprocess crashes. Restarting.");
+		if (KontentumClient.debug)
+			trace("Subprocess crashes. Restarting.");
 		// Network.i.submitAction("APP_CRASH");
 	}
 	
 	static function subprocessDidExit() 
 	{
-		trace("Subprocess exited. Restarting.");
+		if (KontentumClient.debug)
+			trace("Subprocess exited. Restarting.");
 		//NetworkHandler.i.submitAction("APP_EXIT");
 	}	
 	

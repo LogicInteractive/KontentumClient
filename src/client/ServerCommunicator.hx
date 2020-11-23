@@ -16,6 +16,7 @@ import haxe.Json;
 import haxe.Timer;
 import haxe.io.Output;
 import haxe.macro.Expr.Error;
+import no.logic.fox.kontentum.Kontentum;
 import sys.FileSystem;
 import sys.io.File;
 import sys.io.FileOutput;
@@ -29,11 +30,11 @@ import utils.WindowsUtils;
 @:cppFileCode('
 #include <Windows.h>
 ')
-class Network 
+class ServerCommunicator 
 {
 	/////////////////////////////////////////////////////////////////////////////////////
 	
-	static public var i				: Network;
+	static public var i				: ServerCommunicator;
 	
 	/////////////////////////////////////////////////////////////////////////////////////
 	
@@ -67,7 +68,7 @@ class Network
 
 	static public function init()
 	{
-		i = new Network();
+		i = new ServerCommunicator();
 		i.startNet();
 	}
 	
@@ -84,7 +85,8 @@ class Network
  		var adapter = WindowsUtils.getNetworkAdapterInfo( WindowsUtils.ADAPTER_TYPE_ANY );
 		if (adapter.ip == "0.0.0.0")
 		{
-			trace("Network adapter not found!");
+			if (KontentumClient.debug)
+				trace("Network adapter not found!");
 			Timer.delay(startNet, 5000);
 		}
 		else
@@ -108,7 +110,7 @@ class Network
 	
 	function pingCallback() 
 	{
-		if (!waitForResponse)
+		if (!waitForResponse && KontentumClient.ready)
 			makeRequest();
 	}
 
@@ -125,7 +127,8 @@ class Network
 		}
 		catch (e:Dynamic)
 		{
-			trace("Request error..");
+			if (KontentumClient.debug)
+				trace("Request error..");
 		}
 	}
 	
@@ -171,7 +174,8 @@ class Network
 
 			if (jsonPing.success)
 			{
-				trace("ResponseData : " + jsonPing);
+				if (KontentumClient.debug)
+					trace("ResponseData : " + jsonPing);
 				
 				KontentumClient.parseCommand(jsonPing.callback);
 				
@@ -198,7 +202,8 @@ class Network
 			}
 			else
 			{
-				trace("Error: ClientID " + restID + " not found! ");
+				if (KontentumClient.debug)
+					trace("Error: ClientID " + restID + " not found! ");
 			}
 			checkAttributes();
 			requestComplete();
@@ -216,7 +221,8 @@ class Network
 				var newPing:Float = jsonPing.ping;
 				if (newPing != KontentumClient.config.kontentum.interval)
 				{
-					trace("Changing ping time to : " + newPing);
+					if (KontentumClient.debug)
+						trace("Changing ping time to : " + newPing);
 					KontentumClient.config.kontentum.interval = newPing;
 					createTimer();
 				}
@@ -227,8 +233,11 @@ class Network
 	function onPingError(response:HttpResponse) 
 	{
 		if (response==null)
-			trace("Response - error - Response is NULL");
-		else
+		{
+			if (KontentumClient.debug)
+				trace("Response - error - Response is NULL");
+		}
+		else if (KontentumClient.debug)
 		{
 			trace("Response - error: "+ response.status + " " + response.error);
 			trace(response.contentRaw);
@@ -240,7 +249,8 @@ class Network
 	
 	function onPingCorruptData(response:HttpResponse) 
 	{
-		trace("Response - not valid response data: "+ response.status + " " + response.content);
+		if (KontentumClient.debug)
+			trace("Response - not valid response data: "+ response.status + " " + response.content);
 		// no valid data...
 		Sys.sleep(10);
 		requestComplete();
@@ -248,7 +258,8 @@ class Network
 
 	function onHttpError(response:HttpResponse) 
 	{
-		trace("HTTP error: "+response.toString());
+		if (KontentumClient.debug)
+			trace("HTTP error: "+response.toString());
 
 		if (launch == null)
 			launchOffline();
@@ -264,10 +275,13 @@ class Network
 			}
 			catch(e:Dynamic)
 			{
-				trace("Failed to get offline launch cache");
+				if (KontentumClient.debug)				
+					trace("Failed to get offline launch cache");
 			}
 
-			trace("No connection, launching offline: "+launch);
+			if (KontentumClient.debug)
+				trace("No connection, launching offline: "+launch);
+				
 			if (launch!=null && launch!="")
 			{
 				if (isWeb(launch))
@@ -289,17 +303,20 @@ class Network
 		submitActionHttpReq.timeout = 20;
 		submitActionHttpReq.send();
 		
-		trace("Submit action: " + submitURL);
+		if (KontentumClient.debug)
+			trace("Submit action: " + submitURL);
  	}
 	
 	function onSubmitActionHttpResponse(response:HttpResponse)
 	{
 		if (response.isOK)
 		{
-			trace("Submit action: " + response.content);
+			if (KontentumClient.debug)
+				trace("Submit action: " + response.content);
 		}
 		else
-			trace("Submit action error: "+response.error);
+			if (KontentumClient.debug)
+				trace("Submit action error: "+response.error);
 	}  
 	
 	/////////////////////////////////////////////////////////////////////////////////////

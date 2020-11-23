@@ -1,11 +1,12 @@
 package;
 
-import client.Network;
+import client.ServerCommunicator;
 import haxe.macro.Expr.Catch;
 import hxbitmini.CompileTime;
 import no.logic.fox.hwintegration.windows.Chrome;
 import no.logic.fox.kontentum.Kontentum;
 import no.logic.fox.loader.Loader;
+import no.logic.fox.utils.DateUtils;
 import no.logic.fox.utils.ObjUtils;
 import sys.FileSystem;
 import sys.io.File;
@@ -16,6 +17,9 @@ import utils.WindowsUtils;
  * @author Tommy S.
  */
 
+@:cppFileCode('
+#include <windows.h>
+')
 class KontentumClient 
 {
 	/////////////////////////////////////////////////////////////////////////////////////
@@ -23,6 +27,8 @@ class KontentumClient
 	static var i						: KontentumClient;
 	static public var config			: ConfigXML;
 	static public var buildDate			: Date				= CompileTime.buildDate();
+	static public var ready				: Bool				= false;
+	static public var debug				: Bool				= false;
 
 	var waitDelay						: Float				= 0.0;
 	static var firstCommand				: String;
@@ -42,6 +48,7 @@ class KontentumClient
 
 	public function new()
 	{
+		WindowsUtils.setConsoleTitle("Kontentum Client  |  Logic Interactive");
 		Loader.LoadXML("config.xml",null,onLoadXMLComplete,onLoadXMLFailed);
 	}
 
@@ -49,7 +56,7 @@ class KontentumClient
 
 	function onLoadXMLFailed(l:Loader)
 	{
-		debug("Config XML failed to load! ("+l.source+")");
+		Sys.println("Config XML failed to load! ("+l.source+")");
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////
@@ -62,28 +69,33 @@ class KontentumClient
 		}
 		catch(e:Dynamic)
 		{
-			debug("Error : Failed to process XML:",true);
-			debug(l.contentRAW,true);
+			Sys.println("Error : Failed to process XML:");
+			Sys.println(l.contentRAW);
 		}
 
 		initSettings();
-		Network.init();
+		ServerCommunicator.init();
+		if (config.kontentum.download==true)
+			downloadFiles();
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////
 
 	inline function initSettings()
 	{
+		debug = config.debug;
  		if (config.kontentum==null || config.kontentum.ip == null || config.kontentum.api == null || config.kontentum.clientID == 0)
 		{
-			trace("Malformed config xml! Exiting.",true);
+			if (debug)
+				trace("Malformed config xml! Exiting.",true);
+				
 			KontentumClient.exitWithError();
 		}
 
 		if (config.kontentum.exhibitToken==null)
 			config.kontentum.exhibitToken = "_";
 
-		if (!config.debug)
+		if (!config.debug && !config.kontentum.download)
 			WindowsUtils.freeConsole();
 
 		if (config.killexplorer)
@@ -106,8 +118,6 @@ class KontentumClient
 		if (config.kontentum.delay > 0)
 			Sys.sleep(config.kontentum.delay);	 
 
-		if (config.kontentum.download==true)
-			downloadFiles();
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////
@@ -141,11 +151,11 @@ class KontentumClient
 		Sys.exit(1);		
 	}
 
-	static public inline function debug(value:Dynamic,?force:Bool=false)
-	{
-		if (config==null || config.debug || force)
-			trace(value);
-	}
+	// static public inline function debug(value:Dynamic,?force:Bool=false)
+	// {
+	// 	if (config==null || config.debug || force)
+	// 		trace(value);
+	// }
 
 	/////////////////////////////////////////////////////////////////////////////////////
 
@@ -167,7 +177,8 @@ class KontentumClient
 		}
 		catch(e:Dynamic)
 		{
-			trace("Failed to save offline launch file");
+			if (debug)
+				trace("Failed to save offline launch file");
 		}
 	}
 
@@ -175,14 +186,35 @@ class KontentumClient
 
 	function downloadFiles()
 	{
+		var bDate:String = DateUtils.getFormattedDate(KontentumClient.buildDate);
+		// WindowsUtils.allocConsole();
+		Sys.println('/// KONTENTUM ASSET DOWNLOADER /// (Build: $bDate)');
+		Sys.println('');
 		var token = config.kontentum.exhibitToken;
 		Kontentum.onComplete = onKontentumReady;
-		Kontentum.connect(config.kontentum.exhibitToken,null,'c:/logic/kontentum/cache/$token',true,false,false,true);
+		Kontentum.onDownloadFilesProgress = onKontentumDownloadProgress;
+		Kontentum.onDownloadFilesItemComplete = onKontentumDownloadItemComplete;
+
+		var localFileCache:String = Sys.getCwd()+'/cache/$token';
+
+		Kontentum.connect(config.kontentum.exhibitToken,null,localFileCache,true,false,false,true);
 	}
 
+	function onKontentumDownloadProgress()
+	{
+		Sys.print("\r"+Kontentum.downloadFilesProgressString+"    ");
+	}
+
+	function onKontentumDownloadItemComplete()
+	{
+		Sys.print("\n");
+	}
+	
 	function onKontentumReady()
 	{
-		trace("Kontenum ready! ");//+Kontentum.RESTJsonStr);
+		// trace("Kontenum ready! ");//+Kontentum.RESTJsonStr);
+		ready = true;
+		WindowsUtils.freeConsole();		
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////
