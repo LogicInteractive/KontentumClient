@@ -24,7 +24,7 @@ class SubProcess
 	public var restartIfCrash					: Bool			= true;
 	public var restartIfExit					: Bool			= true;
 	public var lifeSpan							: Float			= -1;
-	public var monitor							: Bool			= true;
+	public var monitor							: Bool			= false;
 	public var waitForStart						: Bool			= false;
 	public var lifePingTime						: Int			= 200;		// ms for how often to check if subprocess is alive
 

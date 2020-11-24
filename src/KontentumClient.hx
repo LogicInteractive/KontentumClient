@@ -253,8 +253,7 @@ typedef ConfigXML =
 	var kontentum			: KontentumConfig;
 	var killexplorer		: Bool;
 	var debug				: Bool;
-	var restartAutomatic	: Bool;
-	var appMonitor			: Bool;
+	// var restartAutomatic	: Bool;
 	var overridelaunch		: String;
 	var chrome				: String;
 }

@@ -4,17 +4,14 @@
 		<api>rest/pingClient</api> 
 		<clientID></clientID> 
 		<exhibitToken></exhibitToken> 
-		<token />
-		<interval>1.0</interval>
-		<delay>0.0</delay>
-		<restartdelay>3.0</restartdelay>
 		<download>false</download>
+		<!-- <interval>1.0</interval> -->
+		<!-- <delay>0.0</delay> -->
+		<!-- <restartdelay>3.0</restartdelay> -->
 		<!-- <localFiles>c:/logic/kontentum</localFiles> -->
 	</kontentum>
 	<killexplorer>false</killexplorer> 
 	<debug>false</debug> 
-	<restartAutomatic>true</restartAutomatic> 
 	<overridelaunch></overridelaunch> 
-	<appMonitor>false</appMonitor>
 	<chrome>C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe</chrome> 
 </config>

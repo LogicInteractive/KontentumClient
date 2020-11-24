@@ -126,7 +126,7 @@ class WindowsUtils
 			
 		subProcess = new SubProcess(exeName);
 		subProcess.launchDelay = 0;
-		subProcess.monitor = KontentumClient.config.appMonitor;
+		// subProcess.monitor = KontentumClient.config.appMonitor;
 		subProcess.restartDelay = KontentumClient.config.kontentum.restartdelay;
 		subProcess.subprocessDidCrash = subprocessDidCrash;
 		subProcess.subprocessDidExit = subprocessDidExit;
