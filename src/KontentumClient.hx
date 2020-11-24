@@ -49,6 +49,8 @@ class KontentumClient
 	public function new()
 	{
 		WindowsUtils.setConsoleTitle("Kontentum Client  |  Logic Interactive");
+		printLogo();
+		
 		Loader.LoadXML("config.xml",null,onLoadXMLComplete,onLoadXMLFailed);
 	}
 
@@ -195,7 +197,11 @@ class KontentumClient
 		Kontentum.onDownloadFilesProgress = onKontentumDownloadProgress;
 		Kontentum.onDownloadFilesItemComplete = onKontentumDownloadItemComplete;
 
-		var localFileCache:String = Sys.getCwd()+'/cache/$token';
+		var localFileCache:String = Sys.getCwd();
+		if(config.kontentum.localFiles!=null)
+			localFileCache = config.kontentum.localFiles;
+
+		localFileCache+='/cache/$token';
 
 		Kontentum.connect(config.kontentum.exhibitToken,null,localFileCache,true,false,false,true);
 	}
@@ -217,6 +223,28 @@ class KontentumClient
 		WindowsUtils.freeConsole();		
 	}
 	
+	/////////////////////////////////////////////////////////////////////////////////////
+
+	static function printLogo()
+	{
+		Sys.println('__________________________________________________');
+		Sys.println('                                                  ');
+		Sys.println('    ##                            ##              ');
+		Sys.println('    ##                                            ');
+		Sys.println('    ##    ##########################  ########    ');
+		Sys.println('    ##    ##      ##  ##          ##  ##          ');
+		Sys.println('    ##    ##      ##  ##      ##  ##  ##          ');
+		Sys.println('    ##            ##  ##      ##  ##  ##          ');
+		Sys.println('    ################  ######  ##  ##  ######      ');
+		Sys.println('                              ##                  ');
+		Sys.println('                              ##                  ');
+		Sys.println('                      ##########                  ');
+		Sys.println('                                                  ');
+	    Sys.println('    I   N   T   E   R   A   C   T   I   V   E     ');
+		Sys.println('__________________________________________________');
+		Sys.println('                                                  ');
+	}
+
 	/////////////////////////////////////////////////////////////////////////////////////
 }
 
@@ -241,4 +269,5 @@ typedef KontentumConfig =
 	var delay				: Float;
 	var restartdelay		: Float;
 	var download			: Bool;
+	var localFiles			: String;
 }

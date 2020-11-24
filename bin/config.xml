@@ -2,13 +2,14 @@
 	<kontentum>
 		<ip>https://kontentum.link</ip>
 		<api>rest/pingClient</api> 
-		<clientID></clientID> 
-		<exhibitToken></exhibitToken> 
+		<clientID>345</clientID> 
+		<exhibitToken>owojkp</exhibitToken> 
 		<token />
 		<interval>1.0</interval>
 		<delay>0.0</delay>
 		<restartdelay>3.0</restartdelay>
-		<download>false</download>
+		<download>true</download>
+		<localFiles>c:/logic/kontentum</localFiles>
 	</kontentum>
 	<killexplorer>false</killexplorer> 
 	<debug>false</debug> 
