@@ -1,0 +1,12 @@
+<xml>
+	<set name="PROJECT_DIR" value="${this_dir}" />
+	<set name="CPP_DIR" value="${this_dir}/../cpp/" />
+	
+	<!-- <files id='haxe'>
+		<compilervalue name="-I" value="${CPP_DIR}/include/" />
+	</files> -->
+	<target id='haxe' tool='linker' toolid='exe'>
+		<lib name='${this_dir}/Shell32.Lib' if='windows'/>
+	</target>
+	
+</xml>

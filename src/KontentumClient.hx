@@ -50,6 +50,8 @@ class KontentumClient
 	{
 		WindowsUtils.setConsoleTitle("Kontentum Client  |  Logic Interactive");
 		printLogo();
+
+		// utils.TrayUtils.createTrayIcon("KontentumClient  |  Logic Interactive");
 		
 		Loader.LoadXML("config.xml",null,onLoadXMLComplete,onLoadXMLFailed);
 	}
@@ -145,11 +147,13 @@ class KontentumClient
 
 	static public function exit()
 	{
+		// utils.TrayUtils.removeTrayIcon();
 		Sys.exit(0);		
 	}
 
 	static public function exitWithError()
 	{
+		// utils.TrayUtils.removeTrayIcon();
 		Sys.exit(1);		
 	}
 
@@ -197,11 +201,9 @@ class KontentumClient
 		Kontentum.onDownloadFilesProgress = onKontentumDownloadProgress;
 		Kontentum.onDownloadFilesItemComplete = onKontentumDownloadItemComplete;
 
-		var localFileCache:String = Sys.getCwd();
-		if(config.kontentum.localFiles!=null)
+		var localFileCache:String = Sys.getCwd()+'/cache/$token';
+		if(config.kontentum.localFiles!=null && config.kontentum.localFiles!="")
 			localFileCache = config.kontentum.localFiles;
-
-		localFileCache+='/cache/$token';
 
 		Kontentum.connect(config.kontentum.exhibitToken,null,localFileCache,true,false,false,true);
 	}

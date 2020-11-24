@@ -5,10 +5,7 @@
 		<clientID></clientID> 
 		<exhibitToken></exhibitToken> 
 		<download>false</download>
-		<!-- <interval>1.0</interval> -->
-		<!-- <delay>0.0</delay> -->
-		<!-- <restartdelay>3.0</restartdelay> -->
-		<!-- <localFiles>c:/logic/kontentum</localFiles> -->
+		<localFiles></localFiles>
 	</kontentum>
 	<killexplorer>false</killexplorer> 
 	<debug>false</debug> 
