@@ -8,8 +8,8 @@
 		<interval>1.0</interval>
 		<delay>0.0</delay>
 		<restartdelay>3.0</restartdelay>
-		<download>true</download>
-		<localFiles>c:/logic/kontentum</localFiles>
+		<download>false</download>
+		<!-- <localFiles>c:/logic/kontentum</localFiles> -->
 	</kontentum>
 	<killexplorer>false</killexplorer> 
 	<debug>false</debug> 
