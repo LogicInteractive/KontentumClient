@@ -99,6 +99,7 @@ class ServerCommunicator
 		}
 	}
 	
+	@:keep
 	function createTimer() 
 	{
 		if (pingTimer != null)
@@ -108,14 +109,17 @@ class ServerCommunicator
 		pingTimer.run = pingCallback;		
 	}
 	
+	@:keep
 	function pingCallback() 
 	{
+		trace("ping "+KontentumClient.ready);
 		if (!waitForResponse && KontentumClient.ready)
 			makeRequest();
 	}
 
 	function makeRequest() 
 	{
+		trace("make request");
 		restStr = null;
 		try
 		{

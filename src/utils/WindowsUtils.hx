@@ -5,12 +5,17 @@ import cpp.Char;
 import cpp.ConstCharStar;
 import cpp.ConstPointer;
 import cpp.Lib;
+import cpp.Native;
+import cpp.NativeArray;
+import cpp.NativeSocket;
 import cpp.NativeString;
 import cpp.RawConstPointer;
+import cpp.Reference;
 import haxe.CallStack;
 import haxe.Http;
 import haxe.Json;
 import haxe.Timer;
+import haxe.io.Bytes;
 import haxe.io.Output;
 import haxe.macro.Expr.Error;
 import no.logic.fox.hwintegration.windows.Chrome;
@@ -34,10 +39,94 @@ typedef NetworkAdapterInfo =
 @:cppFileCode('
 #include <winsock2.h>
 #include <iostream>
-#include <stdio.h>
+#include <fstream>
 #include <string.h>
+
+
+#ifndef max
+#define max(a,b) (((a) > (b)) ? (a) : (b))
+#else
+#error max macro is already defined
+#endif
+#ifndef min
+#define min(a,b) (((a) < (b)) ? (a) : (b))
+#else
+#error min macro is already defined
+#endif
+
+// #include <afxstr.h>
+#include <gdiplus.h>
+#include <atlimage.h>
+#undef min
+#undef max
+#undef byte
+
 #include <Iphlpapi.h>
 #pragma comment(lib, "iphlpapi.lib")
+// using namespace Gdiplus;
+// #pragma comment (lib,"Gdiplus.lib")
+using namespace std;
+
+int getEncoderClsid(const wchar_t *format, CLSID *pClsid)
+{
+  UINT num = 0;   /* number of image encoders */
+  UINT size = 0;  /* size of the image encoder array in bytes */
+
+  Gdiplus::ImageCodecInfo *pImageCodecInfo = NULL;
+
+  Gdiplus::GetImageEncodersSize(&num, &size);
+  if (size == 0) {
+    return -1;  /* Failure */
+  }
+
+  pImageCodecInfo = (Gdiplus::ImageCodecInfo *)(malloc(size));
+  if (pImageCodecInfo == NULL) {
+    return -1;  /* Failure */
+  }
+
+  GetImageEncoders(num, size, pImageCodecInfo);
+
+  for (UINT j = 0; j < num; ++j) {
+    if (wcscmp(pImageCodecInfo[j].MimeType, format) == 0 ) {
+      *pClsid = pImageCodecInfo[j].Clsid;
+      free(pImageCodecInfo);
+      return j;  /* Success */
+    }
+  }
+
+  free(pImageCodecInfo);
+  return -1;  /* Failure */
+}
+
+int screenshotSaveBitmap(Gdiplus::Bitmap *b, const wchar_t *filename, const wchar_t *format, long quality)
+{
+  if (filename == NULL) {
+    return -1;  /* Failure */
+  }
+
+  CLSID encoderClsid;
+  Gdiplus::EncoderParameters encoderParameters;
+  Gdiplus::Status stat = Gdiplus::GenericError;
+
+  if (b) {
+    if (getEncoderClsid(format, &encoderClsid) != -1) {
+      if (quality >= 0 && quality <= 100 && wcscmp(format, L"image/jpeg") == 0) {
+        encoderParameters.Count = 1;
+        encoderParameters.Parameter[0].Guid = Gdiplus::EncoderQuality;
+        encoderParameters.Parameter[0].Type = Gdiplus::EncoderParameterValueTypeLong;
+        encoderParameters.Parameter[0].NumberOfValues = 1;
+        encoderParameters.Parameter[0].Value = &quality;
+        stat = b->Save(filename, &encoderClsid, &encoderParameters);
+      } else {
+        stat = b->Save(filename, &encoderClsid, NULL);
+      }
+    }
+    delete b;
+  }
+
+  return (stat == Gdiplus::Ok) ? 0 : 1;
+}
+
 ')
 class WindowsUtils
 {
@@ -92,14 +181,6 @@ class WindowsUtils
 		}
 	}
 
-	@:native("SetConsoleTitle")
-	extern static public function setConsoleTitle(title:String):Void;
-
-	@:native("FreeConsole")
-	extern static public function freeConsole():Bool;
-
-	@:native("AllocConsole")
-	extern static public function allocConsole():Bool;
 	
 	//old
 /* 	static public function runProcess(exeName:String, hidden:Bool=false)
@@ -232,4 +313,84 @@ class WindowsUtils
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////
+
+	static public function takeScreenshot()
+	{
+		var screenshotGdiplusToken:UlongPtr = null;
+		var screenshotGdiplusStartupInput:GdiplusStartupInput = null;
+		Gdiplus.startUp(Native.addressOf(screenshotGdiplusToken),Native.addressOf(screenshotGdiplusStartupInput),null);
+
+		var filename:ConstStarWCharT = untyped __cpp__('L"screenshot.png"');
+		var format:ConstStarWCharT = untyped __cpp__('L"png"');
+		var encoder:ConstStarWCharT = untyped __cpp__('L"image/png"');
+		var quality:Int = -1;
+
+		var desktop:HWND = getDesktopWindow();
+		var desktopDeviceContext:HDC = getDC(desktop);
+		var compatdeviceContext:HDC = createCompatibleDC(desktopDeviceContext);
+		var width:Int = getSystemMetrics(SystemMetrics.SM_CXSCREEN);
+		var height:Int = getSystemMetrics(SystemMetrics.SM_CYSCREEN);
+		var newbmp:HBITMAP = createCompatibleBitmap(desktopDeviceContext, width, height);
+		var oldbmp:HBITMAP = cast selectObject(compatdeviceContext, newbmp);
+
+		bitBlt(compatdeviceContext,0,0,width,height,desktopDeviceContext, 0, 0, untyped SRCCOPY|CAPTUREBLT);
+		selectObject(compatdeviceContext, oldbmp);
+		var b:cpp.Star<GdiBitmap> = Gdiplus.fromHBITMAP(newbmp, null);
+
+		releaseDC(desktop, desktopDeviceContext);
+		deleteObject(newbmp);
+		deleteDC(compatdeviceContext);
+
+		screenshotSaveBitmap(b, filename, encoder, quality);
+
+		Gdiplus.shutdown(screenshotGdiplusToken);
+	}
+
+	/////////////////////////////////////////////////////////////////////////////////////
+
+	@:native("screenshotSaveBitmap")			extern static public function screenshotSaveBitmap(b:cpp.Star<GdiBitmap>, filename:ConstStarWCharT, format:ConstStarWCharT, quality:Int):Int;
+
+	/////////////////////////////////////////////////////////////////////////////////////
+
+	@:native("SetConsoleTitle")					extern static public function setConsoleTitle(title:String):Void;
+	@:native("FreeConsole")						extern static public function freeConsole():Bool;
+	@:native("AllocConsole")					extern static public function allocConsole():Bool;
+	@:native("GetDesktopWindow")				extern static public function getDesktopWindow():HWND;
+	@:native("GetDC")							extern static public function getDC(handle:HWND):HDC;
+	@:native("CreateCompatibleDC")				extern static public function createCompatibleDC(hdc:HDC):HDC;
+	@:native("GetSystemMetrics")				extern static public function getSystemMetrics(nIndex:SystemMetrics):Int;
+	@:native("CreateCompatibleBitmap")			extern static public function createCompatibleBitmap(hdc:HDC,cx:Int,cy:Int):HBITMAP;
+	@:native("SelectObject")					extern static public function selectObject(hdc:HDC,h:HBITMAP):HGDIOBJ;
+	@:native("ReleaseDC")						extern static public function releaseDC(hWnd:HWND,hDC:HDC):Int;
+	@:native("DeleteObject")					extern static public function deleteObject(ho:HBITMAP):Bool;
+	@:native("DeleteDC")						extern static public function deleteDC(hdc:HDC):Bool;
+	@:native("BitBlt")							extern static public function bitBlt(hdc:HDC,x:Int,y:Int,cx:Int,cy:Int,hdcSrc:HDC,x1:Int,y1:Int,rop:DWord):Bool;
+
+	/////////////////////////////////////////////////////////////////////////////////////
+}
+
+extern class Gdiplus
+{
+	@:native("Gdiplus::GdiplusStartup")			static public function startUp(screenshotGdiplusToken:cpp.Star<UlongPtr>, screenshotGdiplusStartupInput:cpp.ConstStar<GdiplusStartupInput>, output:cpp.Star<GdiplusStartupOutput>):Int;
+	@:native("Gdiplus::GdiplusShutdown")		static public function shutdown(screenshotGdiplusToken:UlongPtr):Int;
+	@:native("Gdiplus::Bitmap::FromHBITMAP")	static public function fromHBITMAP(hbm:HBITMAP,hpal:HPALETTE):cpp.Star<GdiBitmap>;
+}
+
+@:native("DWORD") 								extern class DWord {}
+@:native("ULONG_PTR") 							extern class UlongPtr {}
+@:native("HWND") 								extern class HWND {}
+@:native("HDC") 								extern class HDC {}
+@:native("Gdiplus::GdiplusStartupInput") 		extern class GdiplusStartupInput {}
+@:native("Gdiplus::GdiplusStartupOutput") 		extern class GdiplusStartupOutput {}
+@:native("Gdiplus::Bitmap") 					extern class GdiBitmap {}
+@:native("HBITMAP") 							extern class HBITMAP {}
+@:native("HGDIOBJ")								extern class HGDIOBJ {}
+@:native("HPALETTE") 							extern class HPALETTE {}
+@:native("const wchar_t *") 					extern class ConstStarWCharT {}
+
+//https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getsystemmetrics
+enum abstract SystemMetrics(Int)
+{
+	var SM_CXSCREEN = 0;
+	var SM_CYSCREEN = 1;
 }

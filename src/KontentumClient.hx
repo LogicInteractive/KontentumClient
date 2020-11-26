@@ -18,6 +18,7 @@ import utils.WindowsUtils;
  */
 
 @:cppFileCode('
+#include <iostream>
 #include <windows.h>
 ')
 class KontentumClient 
@@ -53,6 +54,9 @@ class KontentumClient
 
 		// utils.TrayUtils.createTrayIcon("KontentumClient  |  Logic Interactive");
 		
+		// WindowsUtils.takeScreenshot();
+		// return;
+
 		Loader.LoadXML("config.xml",null,onLoadXMLComplete,onLoadXMLFailed);
 	}
 
@@ -81,6 +85,8 @@ class KontentumClient
 		ServerCommunicator.init();
 		if (config.kontentum.download==true)
 			downloadFiles();
+		else 
+			KontentumClient.ready = true;
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////
@@ -88,6 +94,8 @@ class KontentumClient
 	inline function initSettings()
 	{
 		debug = config.debug;
+		config.kontentum.interval = 1.0;
+		
  		if (config.kontentum==null || config.kontentum.ip == null || config.kontentum.api == null || config.kontentum.clientID == 0)
 		{
 			if (debug)
@@ -118,6 +126,7 @@ class KontentumClient
 		
 		if (config.kontentum.interval == 0)
 			config.kontentum.interval = 15;
+
 
 		if (config.kontentum.delay > 0)
 			Sys.sleep(config.kontentum.delay);	 
