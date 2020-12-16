@@ -85,7 +85,7 @@ class KontentumClient
 
 		initSettings();
 		ServerCommunicator.init();
-		if (config.kontentum.download!=null)
+		if (config.kontentum.download==true)
 		{
 			KontentumClient.downloadFiles = config.kontentum.download;
 			if (KontentumClient.downloadFiles)
