@@ -189,7 +189,10 @@ class ServerCommunicator
 				if (KontentumClient.debug)
 					trace("ResponseData : " + jsonPing);
 				
-				KontentumClient.parseCommand(jsonPing.callback);
+				if (jsonPing.callback==SystemCommand.shutdown&&jsonPing.sleep==true)
+					KontentumClient.parseCommand(SystemCommand.sleep);
+				else
+					KontentumClient.parseCommand(jsonPing.callback);
 				
 				if (launch == null)
 				{
@@ -364,6 +367,7 @@ typedef JSONPingData =
 	var callback	: SystemCommand;
 	var success		: Bool;
 	var client		: Dynamic;
+	var sleep		: Bool;
 }
 
 enum abstract SystemCommand(String) to String
