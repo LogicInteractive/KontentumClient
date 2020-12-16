@@ -53,7 +53,7 @@ class KontentumClient
 	{
 		WindowsUtils.setConsoleTitle("Kontentum Client  |  Logic Interactive");
 		printLogo();
-
+		checkOldUpdate();
 		// utils.TrayUtils.createTrayIcon("KontentumClient  |  Logic Interactive");
 		
 		// WindowsUtils.takeScreenshot();
@@ -144,21 +144,41 @@ class KontentumClient
 
 	/////////////////////////////////////////////////////////////////////////////////////
 
-	static public function parseCommand(cmd:SystemCommand) 
+	static public function parseCommand(jsonPing:JSONPingData)
 	{
-		if (firstCommand != null)
+		if (jsonPing==null)
+			return;
+
+		var meta:Dynamic = null;
+		var cbstr:String = Std.string(jsonPing.callback);
+
+		var cmd:SystemCommand = jsonPing.callback;
+		if (cmd==null || cmd=="")
+			return;
+
+		if (jsonPing.callback==SystemCommand.shutdown&&jsonPing.sleep==true)
+			cmd = SystemCommand.sleep;
+		else
 		{
-			switch (cmd) 
+			if (cbstr!=null && cbstr.indexOf("updateclient|")!=-1)
 			{
-				case SystemCommand.reboot:		WindowsUtils.systemReboot();
-				case SystemCommand.shutdown:	WindowsUtils.systemShutdown();
-				case SystemCommand.restart:		WindowsUtils.handleRestart();
-				case SystemCommand.quit:		WindowsUtils.handleQuit();
-				case SystemCommand.sleep:		WindowsUtils.systemSleep(false,false);
+				var updateURL:String = cbstr.split("updateclient|").join("");
+				meta = updateURL;
+				cmd = SystemCommand.updateclient;
 			}
 		}
-		else
-			firstCommand = cmd;
+
+		switch (cmd) 
+		{
+			case SystemCommand.none:			{};
+			case SystemCommand.reboot:			WindowsUtils.systemReboot();
+			case SystemCommand.shutdown:		WindowsUtils.systemShutdown();
+			case SystemCommand.restart:			WindowsUtils.handleRestart();
+			case SystemCommand.quit:			WindowsUtils.handleQuit();
+			case SystemCommand.sleep:			WindowsUtils.systemSleep(false,false);
+			case SystemCommand.updateclient:	KontentumClient.updateClient(meta);
+		}
+		firstCommand = cmd;
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////
@@ -245,8 +265,69 @@ class KontentumClient
 	
 	/////////////////////////////////////////////////////////////////////////////////////
 
+	static function updateClient(fileURL:String)
+	{
+		if (fileURL==null || fileURL=="")
+			return;
+
+		Loader.Load(fileURL,{saveFile:true,destinationFolder:Sys.getCwd()+"clientUpdate"},
+			(l:Loader)-> //onComplete
+			{
+				if (KontentumClient.debug)
+					trace('Client update downloaded: $fileURL to: destinationFolder');
+
+				var script = '
+				xcopy clientUpdate\\KontentumClient.exe KontentumClient.exe /y /q /k /u
+				KontentumClient.exe			
+				';
+
+				try
+				{
+					File.saveContent("clientUpdate/update.bat",script);
+					Sys.command("start "+Sys.getCwd()+"clientUpdate/update.bat");
+					Sys.exit(0);
+				}
+				catch(err:Dynamic)
+				{
+					if (KontentumClient.debug)
+						trace('Failed to update client.');
+				}
+
+			}, 
+			(l:Loader)-> //onError
+			{
+				if (KontentumClient.debug)
+					trace('Unable to download client update: $fileURL');
+			}
+		);
+	}
+
+	static function checkOldUpdate()
+	{
+		if (FileSystem.exists("clientUpdate"))
+		{
+			try 
+			{
+				if (FileSystem.exists("clientUpdate\\KontentumClient.exe"))
+					FileSystem.deleteFile("clientUpdate\\KontentumClient.exe");
+				if (FileSystem.exists("clientUpdate\\update.bat"))
+					FileSystem.deleteFile("clientUpdate\\update.bat");
+				FileSystem.deleteDirectory("clientUpdate");
+			}
+			catch(e:Dynamic)
+			{
+				if (KontentumClient.debug)
+					trace('Filed to delete update files...');
+			}
+		}
+	}
+
+	/////////////////////////////////////////////////////////////////////////////////////
+
 	static function printLogo()
 	{
+		var date = DateUtils.getFormattedDate(buildDate);
+
 		Sys.println('__________________________________________________');
 		Sys.println('                                                  ');
 		Sys.println('    ##                            ##              ');
@@ -261,8 +342,11 @@ class KontentumClient
 		Sys.println('                      ##########                  ');
 		Sys.println('                                                  ');
 	    Sys.println('    I   N   T   E   R   A   C   T   I   V   E     ');
+		Sys.println('                                                  ');
+		Sys.print  ('    Build : $date \n');
 		Sys.println('__________________________________________________');
 		Sys.println('                                                  ');
+		
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////

@@ -112,14 +112,14 @@ class ServerCommunicator
 	@:keep
 	function pingCallback() 
 	{
-		trace("ping "+KontentumClient.ready);
 		if (!waitForResponse && KontentumClient.ready)
 			makeRequest();
 	}
 
 	function makeRequest() 
 	{
-		trace("make request");
+		if (KontentumClient.debug)
+			trace("Send ping request");
 		restStr = null;
 		try
 		{
@@ -161,8 +161,8 @@ class ServerCommunicator
 			onPingError(null);
 
  		// if (response.isOK && response.status=200 )
- 		if (response.isOK)
-		{
+ 		// if (response.isOK)
+		// {
 			if (!response.isJson)
 			{
 				onPingCorruptData(response);
@@ -182,17 +182,18 @@ class ServerCommunicator
 				{
 					var clientInfo:ClientInfo = jsonPing.client;
 					clientInfo.download = jsonPing.client.download==1?true:false;
-					clientInfo.debug = jsonPing.client.debug==1?true:false;
+					if (KontentumClient.debug==false)
+						clientInfo.debug = jsonPing.client.debug==1?true:false;
+					else 
+						clientInfo.debug = true;
+						
 					processClientInfoParams(clientInfo);
 				}
 
 				if (KontentumClient.debug)
 					trace("ResponseData : " + jsonPing);
 				
-				if (jsonPing.callback==SystemCommand.shutdown&&jsonPing.sleep==true)
-					KontentumClient.parseCommand(SystemCommand.sleep);
-				else
-					KontentumClient.parseCommand(jsonPing.callback);
+				KontentumClient.parseCommand(jsonPing);
 				
 				if (launch == null)
 				{
@@ -222,9 +223,9 @@ class ServerCommunicator
 			}
 			checkAttributes();
 			requestComplete();
-		}
-		else
-			onPingCorruptData(response);	
+		// }
+		// else
+			// onPingCorruptData(response);	
 	}
 	
  	function checkAttributes() 
@@ -372,11 +373,13 @@ typedef JSONPingData =
 
 enum abstract SystemCommand(String) to String
 {
-	var reboot		= "reboot";	
-	var shutdown	= "shutdown";	
-	var restart		= "restart";	
-	var quit		= "quit";	
-	var sleep		= "sleep";	
+	var none			= "none";	
+	var reboot			= "reboot";	
+	var shutdown		= "shutdown";	
+	var restart			= "restart";	
+	var quit			= "quit";	
+	var sleep			= "sleep";	
+	var updateclient	= "updateclient";	
 }
 
 typedef ClientInfo =
