@@ -42,7 +42,13 @@ typedef NetworkAdapterInfo =
 #include <fstream>
 #include <string.h>
 
+#pragma comment(lib, "PowrProf.lib")
+#include <powrprof.h>
 
+#pragma comment(lib, "iphlpapi.lib")
+#include <Iphlpapi.h>
+
+/*
 #ifndef max
 #define max(a,b) (((a) > (b)) ? (a) : (b))
 #else
@@ -61,72 +67,69 @@ typedef NetworkAdapterInfo =
 #undef max
 #undef byte
 
-#include <Iphlpapi.h>
-#pragma comment(lib, "iphlpapi.lib")
 // using namespace Gdiplus;
 // #pragma comment (lib,"Gdiplus.lib")
 using namespace std;
+*/
+// int getEncoderClsid(const wchar_t *format, CLSID *pClsid)
+// {
+//   UINT num = 0;   /* number of image encoders */
+//   UINT size = 0;  /* size of the image encoder array in bytes */
 
-int getEncoderClsid(const wchar_t *format, CLSID *pClsid)
-{
-  UINT num = 0;   /* number of image encoders */
-  UINT size = 0;  /* size of the image encoder array in bytes */
+//   Gdiplus::ImageCodecInfo *pImageCodecInfo = NULL;
 
-  Gdiplus::ImageCodecInfo *pImageCodecInfo = NULL;
+//   Gdiplus::GetImageEncodersSize(&num, &size);
+//   if (size == 0) {
+//     return -1;  /* Failure */
+//   }
 
-  Gdiplus::GetImageEncodersSize(&num, &size);
-  if (size == 0) {
-    return -1;  /* Failure */
-  }
+//   pImageCodecInfo = (Gdiplus::ImageCodecInfo *)(malloc(size));
+//   if (pImageCodecInfo == NULL) {
+//     return -1;  /* Failure */
+//   }
 
-  pImageCodecInfo = (Gdiplus::ImageCodecInfo *)(malloc(size));
-  if (pImageCodecInfo == NULL) {
-    return -1;  /* Failure */
-  }
+//   GetImageEncoders(num, size, pImageCodecInfo);
 
-  GetImageEncoders(num, size, pImageCodecInfo);
+//   for (UINT j = 0; j < num; ++j) {
+//     if (wcscmp(pImageCodecInfo[j].MimeType, format) == 0 ) {
+//       *pClsid = pImageCodecInfo[j].Clsid;
+//       free(pImageCodecInfo);
+//       return j;  /* Success */
+//     }
+//   }
 
-  for (UINT j = 0; j < num; ++j) {
-    if (wcscmp(pImageCodecInfo[j].MimeType, format) == 0 ) {
-      *pClsid = pImageCodecInfo[j].Clsid;
-      free(pImageCodecInfo);
-      return j;  /* Success */
-    }
-  }
+//   free(pImageCodecInfo);
+//   return -1;  /* Failure */
+// }
 
-  free(pImageCodecInfo);
-  return -1;  /* Failure */
-}
+// int screenshotSaveBitmap(Gdiplus::Bitmap *b, const wchar_t *filename, const wchar_t *format, long quality)
+// {
+//   if (filename == NULL) {
+//     return -1;  /* Failure */
+//   }
 
-int screenshotSaveBitmap(Gdiplus::Bitmap *b, const wchar_t *filename, const wchar_t *format, long quality)
-{
-  if (filename == NULL) {
-    return -1;  /* Failure */
-  }
+//   CLSID encoderClsid;
+//   Gdiplus::EncoderParameters encoderParameters;
+//   Gdiplus::Status stat = Gdiplus::GenericError;
 
-  CLSID encoderClsid;
-  Gdiplus::EncoderParameters encoderParameters;
-  Gdiplus::Status stat = Gdiplus::GenericError;
+//   if (b) {
+//     if (getEncoderClsid(format, &encoderClsid) != -1) {
+//       if (quality >= 0 && quality <= 100 && wcscmp(format, L"image/jpeg") == 0) {
+//         encoderParameters.Count = 1;
+//         encoderParameters.Parameter[0].Guid = Gdiplus::EncoderQuality;
+//         encoderParameters.Parameter[0].Type = Gdiplus::EncoderParameterValueTypeLong;
+//         encoderParameters.Parameter[0].NumberOfValues = 1;
+//         encoderParameters.Parameter[0].Value = &quality;
+//         stat = b->Save(filename, &encoderClsid, &encoderParameters);
+//       } else {
+//         stat = b->Save(filename, &encoderClsid, NULL);
+//       }
+//     }
+//     delete b;
+//   }
 
-  if (b) {
-    if (getEncoderClsid(format, &encoderClsid) != -1) {
-      if (quality >= 0 && quality <= 100 && wcscmp(format, L"image/jpeg") == 0) {
-        encoderParameters.Count = 1;
-        encoderParameters.Parameter[0].Guid = Gdiplus::EncoderQuality;
-        encoderParameters.Parameter[0].Type = Gdiplus::EncoderParameterValueTypeLong;
-        encoderParameters.Parameter[0].NumberOfValues = 1;
-        encoderParameters.Parameter[0].Value = &quality;
-        stat = b->Save(filename, &encoderClsid, &encoderParameters);
-      } else {
-        stat = b->Save(filename, &encoderClsid, NULL);
-      }
-    }
-    delete b;
-  }
-
-  return (stat == Gdiplus::Ok) ? 0 : 1;
-}
-
+//   return (stat == Gdiplus::Ok) ? 0 : 1;
+// }
 ')
 class WindowsUtils
 {
@@ -164,6 +167,11 @@ class WindowsUtils
 		//#elseif mac
 		//
 		//#end
+	}
+	
+	static public function systemSleep(bHibernate:Bool=false,bWakeupEventsDisabled:Bool=false)
+	{
+		setSuspendState(bHibernate,false,bWakeupEventsDisabled);
 	}
 	
 	static public function killExplorer() 
@@ -316,6 +324,7 @@ class WindowsUtils
 
 	static public function takeScreenshot()
 	{
+		/*
 		var screenshotGdiplusToken:UlongPtr = null;
 		var screenshotGdiplusStartupInput:GdiplusStartupInput = null;
 		Gdiplus.startUp(Native.addressOf(screenshotGdiplusToken),Native.addressOf(screenshotGdiplusStartupInput),null);
@@ -344,14 +353,16 @@ class WindowsUtils
 		screenshotSaveBitmap(b, filename, encoder, quality);
 
 		Gdiplus.shutdown(screenshotGdiplusToken);
+		*/
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////
 
-	@:native("screenshotSaveBitmap")			extern static public function screenshotSaveBitmap(b:cpp.Star<GdiBitmap>, filename:ConstStarWCharT, format:ConstStarWCharT, quality:Int):Int;
+	// @:native("screenshotSaveBitmap")			extern static public function screenshotSaveBitmap(b:cpp.Star<GdiBitmap>, filename:ConstStarWCharT, format:ConstStarWCharT, quality:Int):Int;
 
 	/////////////////////////////////////////////////////////////////////////////////////
 
+	@:native("SetSuspendState")					extern static public function setSuspendState(bHibernate:Bool=false,bForce:Bool,bWakeupEventsDisabled:Bool=false):Bool;
 	@:native("SetConsoleTitle")					extern static public function setConsoleTitle(title:String):Void;
 	@:native("FreeConsole")						extern static public function freeConsole():Bool;
 	@:native("AllocConsole")					extern static public function allocConsole():Bool;
@@ -369,20 +380,20 @@ class WindowsUtils
 	/////////////////////////////////////////////////////////////////////////////////////
 }
 
-extern class Gdiplus
+/* extern class Gdiplus
 {
 	@:native("Gdiplus::GdiplusStartup")			static public function startUp(screenshotGdiplusToken:cpp.Star<UlongPtr>, screenshotGdiplusStartupInput:cpp.ConstStar<GdiplusStartupInput>, output:cpp.Star<GdiplusStartupOutput>):Int;
 	@:native("Gdiplus::GdiplusShutdown")		static public function shutdown(screenshotGdiplusToken:UlongPtr):Int;
 	@:native("Gdiplus::Bitmap::FromHBITMAP")	static public function fromHBITMAP(hbm:HBITMAP,hpal:HPALETTE):cpp.Star<GdiBitmap>;
-}
+} */
 
 @:native("DWORD") 								extern class DWord {}
 @:native("ULONG_PTR") 							extern class UlongPtr {}
 @:native("HWND") 								extern class HWND {}
 @:native("HDC") 								extern class HDC {}
-@:native("Gdiplus::GdiplusStartupInput") 		extern class GdiplusStartupInput {}
-@:native("Gdiplus::GdiplusStartupOutput") 		extern class GdiplusStartupOutput {}
-@:native("Gdiplus::Bitmap") 					extern class GdiBitmap {}
+// @:native("Gdiplus::GdiplusStartupInput") 		extern class GdiplusStartupInput {}
+// @:native("Gdiplus::GdiplusStartupOutput") 		extern class GdiplusStartupOutput {}
+// @:native("Gdiplus::Bitmap") 					extern class GdiBitmap {}
 @:native("HBITMAP") 							extern class HBITMAP {}
 @:native("HGDIOBJ")								extern class HGDIOBJ {}
 @:native("HPALETTE") 							extern class HPALETTE {}

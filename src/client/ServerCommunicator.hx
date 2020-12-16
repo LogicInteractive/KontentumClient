@@ -178,6 +178,14 @@ class ServerCommunicator
 
 			if (jsonPing.success)
 			{
+				if (jsonPing.client != null)
+				{
+					var clientInfo:ClientInfo = jsonPing.client;
+					clientInfo.download = jsonPing.client.download==1?true:false;
+					clientInfo.debug = jsonPing.client.debug==1?true:false;
+					processClientInfoParams(clientInfo);
+				}
+
 				if (KontentumClient.debug)
 					trace("ResponseData : " + jsonPing);
 				
@@ -325,6 +333,21 @@ class ServerCommunicator
 	
 	/////////////////////////////////////////////////////////////////////////////////////
 
+	function processClientInfoParams(ci:ClientInfo)
+	{
+		if (ci.debug!=null)
+			KontentumClient.debug = ci.debug;
+
+		if (ci.download!=null)
+			KontentumClient.downloadFiles = ci.download;
+
+		if (ci.killexplorer!=null)
+			KontentumClient.killExplorer = ci.killexplorer;
+	}
+
+
+	/////////////////////////////////////////////////////////////////////////////////////
+
 	inline function isWeb(path:String):Bool
 	{
 		return (path!=null && (path.indexOf("http://")!=-1 || path.indexOf("https://")!=-1 || path.indexOf("file://")!=-1) );
@@ -340,6 +363,7 @@ typedef JSONPingData =
 	var launch		: String;
 	var callback	: SystemCommand;
 	var success		: Bool;
+	var client		: Dynamic;
 }
 
 enum abstract SystemCommand(String) to String
@@ -348,4 +372,51 @@ enum abstract SystemCommand(String) to String
 	var shutdown	= "shutdown";	
 	var restart		= "restart";	
 	var quit		= "quit";	
+	var sleep		= "sleep";	
 }
+
+typedef ClientInfo =
+{
+	var id				: Int;
+	var app_id			: Int;
+	var exhibit_id		: Int;
+	var client_type		: String;
+	var name			: String;
+	var hostname		: String;
+	var ip				: String;
+	var mac				: String;
+	var client_version	: String;
+	var launch			: String;
+	var last_ping		: String;
+	var description		: String;
+	var callback		: String;
+	var download		: Null<Bool>;
+	var killexplorer	: Null<Bool>;
+	var debug			: Null<Bool>;
+	var token			: String;
+	var exhibit_name	: String;
+}
+
+/* 
+	var id": "370",
+	var app_id": "14",
+	var exhibit_id": "148",
+	var client_type": "cmp",
+	var name": "Vannkraftverket",
+	var hostname": "DESKTOP-0VD7TTL",
+	var ip": "95.130.220.50",
+	var mac": "50:3E:AA:E1:BD:E7",
+	var client_version": "2020-11-26 16:50:11",
+	var launch": "c:\/Logic\/app\/TM_Vannkraft2.exe",
+	var last_ping": "2020-12-04 11:00:25",
+	var description": "",
+	var callback": "",
+	var appctrl": "0",
+	var shutdown": "0",
+	var reboot": "1",
+	var download": "0",
+	var killexplorer": "0",
+	var debug": "0",
+	var token": "rke0d6",
+	var exhibit_name": "Vannkraftverket"
+ */

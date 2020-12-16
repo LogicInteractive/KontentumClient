@@ -30,6 +30,8 @@ class KontentumClient
 	static public var buildDate			: Date				= CompileTime.buildDate();
 	static public var ready				: Bool				= false;
 	static public var debug				: Bool				= false;
+	static public var downloadFiles		: Bool				= false;
+	static public var killExplorer		: Bool				= false;
 
 	var waitDelay						: Float				= 0.0;
 	static var firstCommand				: String;
@@ -83,8 +85,12 @@ class KontentumClient
 
 		initSettings();
 		ServerCommunicator.init();
-		if (config.kontentum.download==true)
-			downloadFiles();
+		if (config.kontentum.download!=null)
+		{
+			KontentumClient.downloadFiles = config.kontentum.download;
+			if (KontentumClient.downloadFiles)
+				startFileDownload();
+		}
 		else 
 			KontentumClient.ready = true;
 	}
@@ -110,7 +116,10 @@ class KontentumClient
 		if (!config.debug && !config.kontentum.download)
 			WindowsUtils.freeConsole();
 
-		if (config.killexplorer)
+		if (config.killexplorer!=null)
+			KontentumClient.killExplorer = config.killexplorer;
+
+		if (KontentumClient.killExplorer)
 			WindowsUtils.killExplorer();
 
 		var args = Sys.args();
@@ -145,7 +154,7 @@ class KontentumClient
 				case SystemCommand.shutdown:	WindowsUtils.systemShutdown();
 				case SystemCommand.restart:		WindowsUtils.handleRestart();
 				case SystemCommand.quit:		WindowsUtils.handleQuit();
-
+				case SystemCommand.sleep:		WindowsUtils.systemSleep(false,false);
 			}
 		}
 		else
@@ -199,7 +208,7 @@ class KontentumClient
 
 	/////////////////////////////////////////////////////////////////////////////////////
 
-	function downloadFiles()
+	function startFileDownload()
 	{
 		var bDate:String = DateUtils.getFormattedDate(KontentumClient.buildDate);
 		// WindowsUtils.allocConsole();
@@ -262,8 +271,8 @@ class KontentumClient
 typedef ConfigXML =
 {
 	var kontentum			: KontentumConfig;
-	var killexplorer		: Bool;
-	var debug				: Bool;
+	var killexplorer		: Null<Bool>;
+	var debug				: Null<Bool>;
 	// var restartAutomatic	: Bool;
 	var overridelaunch		: String;
 	var chrome				: String;
@@ -278,6 +287,6 @@ typedef KontentumConfig =
 	var interval			: Float;
 	var delay				: Float;
 	var restartdelay		: Float;
-	var download			: Bool;
+	var download			: Null<Bool>;
 	var localFiles			: String;
 }
