@@ -2,12 +2,14 @@
 	<kontentum>
 		<ip>https://kontentum.link</ip>
 		<api>rest/pingClient</api> 
-		<clientID>234</clientID> 
-		<exhibitToken>ezgok0</exhibitToken> 
+		<clientID></clientID> 
+		<exhibitToken></exhibitToken> 
 		<download>false</download>
 		<localFiles></localFiles>
 	</kontentum>
 	<killexplorer>false</killexplorer> 
-	<debug>true</debug> 
+	<debug>false</debug> 
 	<overridelaunch></overridelaunch> 
 </config>
+
+
