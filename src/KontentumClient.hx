@@ -1,6 +1,8 @@
 package;
 
 import client.ServerCommunicator;
+import haxe.Resource;
+import haxe.io.Bytes;
 import haxe.macro.Expr.Catch;
 import hxbitmini.CompileTime;
 import no.logic.fox.hwintegration.windows.Chrome;
@@ -276,15 +278,28 @@ class KontentumClient
 				if (KontentumClient.debug)
 					trace('Client update downloaded: $fileURL to: destinationFolder');
 
+				/*
 				var script = '
 				xcopy clientUpdate\\KontentumClient.exe KontentumClient.exe /y /q /k /u
-				KontentumClient.exe			
+				shutdown /r /f /t 0				
 				';
+				*/
+				var updaterExe:Bytes = Resource.getBytes("updater");
+				if (updaterExe==null)
+				{
+					if (KontentumClient.debug)
+						trace('Updater failed to extract.');
+
+					return;
+				}
 
 				try
 				{
-					File.saveContent("clientUpdate/update.bat",script);
-					Sys.command("start "+Sys.getCwd()+"clientUpdate/update.bat");
+					File.saveBytes("clientUpdate/ClientUpdater.exe",updaterExe);
+					Sys.command("start "+Sys.getCwd()+"clientUpdate/ClientUpdater.exe");
+					
+					// File.saveContent("clientUpdate/update.bat",script);
+					// Sys.command("start "+Sys.getCwd()+"clientUpdate/update.bat");
 					Sys.exit(0);
 				}
 				catch(err:Dynamic)
@@ -292,7 +307,6 @@ class KontentumClient
 					if (KontentumClient.debug)
 						trace('Failed to update client.');
 				}
-
 			}, 
 			(l:Loader)-> //onError
 			{
