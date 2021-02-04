@@ -335,7 +335,7 @@ class WindowsUtils
 		');
 		#else//if Linux
 
-		var nrs:String ="";
+/* 		var nrs:String ="";
 
 		untyped __cpp__('
 			// int s;
@@ -370,7 +370,7 @@ struct ifreq ifr;
   close(s);
 
 
-		');
+		'); */
 
 		// for (s in 0...6)
 		// {
