@@ -6,6 +6,7 @@
 -D HXCPP_STACK_TRACE
 -D HXCPP_STACK_LINE
 -D HXCPP_M64
+-D windows
 --times
 --resource bin/ClientUpdater.exe@updater
 

@@ -27,9 +27,11 @@ import utils.WindowsUtils;
  * @author Tommy S.
  */
 
+#if windows
 @:cppFileCode('
-#include <Windows.h>
+// #include <Windows.h>
 ')
+#end
 class ServerCommunicator 
 {
 	/////////////////////////////////////////////////////////////////////////////////////

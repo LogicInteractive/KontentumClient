@@ -19,10 +19,12 @@ import utils.WindowsUtils;
  * @author Tommy S.
  */
 
+#if windows
 @:cppFileCode('
 #include <iostream>
 #include <windows.h>
 ')
+#end
 class KontentumClient 
 {
 	/////////////////////////////////////////////////////////////////////////////////////
@@ -53,7 +55,9 @@ class KontentumClient
 
 	public function new()
 	{
+		#if windows
 		WindowsUtils.setConsoleTitle("Kontentum Client  |  Logic Interactive");
+		#end
 		printLogo();
 		checkOldUpdate();
 		// utils.TrayUtils.createTrayIcon("KontentumClient  |  Logic Interactive");
@@ -115,6 +119,7 @@ class KontentumClient
 		if (config.kontentum.exhibitToken==null)
 			config.kontentum.exhibitToken = "_";
 
+		#if windows
 		if (!config.debug && !config.kontentum.download)
 			WindowsUtils.freeConsole();
 
@@ -123,6 +128,7 @@ class KontentumClient
 
 		if (KontentumClient.killExplorer)
 			WindowsUtils.killExplorer();
+		#end
 
 		var args = Sys.args();
 		if (args != null && args.length > 1)
@@ -262,7 +268,9 @@ class KontentumClient
 	{
 		// trace("Kontenum ready! ");//+Kontentum.RESTJsonStr);
 		ready = true;
+		#if windows
 		WindowsUtils.freeConsole();		
+		#end
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////

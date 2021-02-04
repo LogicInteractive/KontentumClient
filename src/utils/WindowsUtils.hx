@@ -35,7 +35,8 @@ typedef NetworkAdapterInfo =
 	@:optional	var mac			: String;
 	@:optional	var hostname	: String;
 }
- 
+
+#if windows
 @:cppFileCode('
 #include <winsock2.h>
 #include <iostream>
@@ -131,6 +132,16 @@ using namespace std;
 //   return (stat == Gdiplus::Ok) ? 0 : 1;
 // }
 ')
+#else//if linux
+@:cppFileCode('
+#include <stdio.h>
+#include <sys/ioctl.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <net/if.h>
+#include <iostream>
+')
+#end
 class WindowsUtils
 {
 	/////////////////////////////////////////////////////////////////////////////////////
@@ -171,22 +182,28 @@ class WindowsUtils
 	
 	static public function systemSleep(bHibernate:Bool=false,bWakeupEventsDisabled:Bool=false)
 	{
+		#if windows		
 		setSuspendState(bHibernate,false,bWakeupEventsDisabled);
+		#end
 	}
 	
 	static public function killExplorer() 
 	{
+		#if windows
 		isExplorerKilled = true;
 		Sys.command("taskkill",["/F","/IM","explorer.exe"]);
+		#end
 	}
 	
 	static public function launchExplorer() 
 	{
+		#if windows
 		if (isExplorerKilled)
 		{
 			Sys.command("explorer.exe");
 			isExplorerKilled = false;
 		}
+		#end
 	}
 
 	
@@ -274,7 +291,7 @@ class WindowsUtils
 	{
 		var ip:ConstPointer<Char> = null;
 		var mac:ConstPointer<Char> = null;
-		
+		#if windows
 		untyped __cpp__('
 		
 			PIP_ADAPTER_INFO AdapterInfo;
@@ -316,7 +333,60 @@ class WindowsUtils
 			}
 			free(AdapterInfo);
 		');
-		
+		#else//if Linux
+
+		var nrs:String ="";
+
+		untyped __cpp__('
+			// int s;
+			// struct ifreq buffer;
+
+			// s = socket(PF_INET, SOCK_DGRAM, 0);
+
+			// memset(&buffer, 0x00, sizeof(buffer));
+			
+			// strcpy(buffer.ifr_name, "eth0");
+
+			// ioctl(s, SIOCGIFHWADDR, &buffer);
+
+			// close(s);
+
+struct ifreq ifr;
+  int s;
+  if ((s = socket(AF_INET, SOCK_STREAM,0)) < 0) {
+    perror("socket");
+    return -1;
+  }
+  
+  strcpy(ifr.ifr_name, "eth0");
+  if (ioctl(s, SIOCGIFHWADDR, &ifr) < 0) {
+    perror("ioctl");
+    return -1;
+  }
+  
+  unsigned char *hwaddr = (unsigned char *)ifr.ifr_hwaddr.sa_data;
+  printf("%02X:%02X:%02X:%02X:%02X:%02X\\n", hwaddr[0], hwaddr[1], hwaddr[2],
+                                          hwaddr[3], hwaddr[4], hwaddr[5]);
+  close(s);
+
+
+		');
+
+		// for (s in 0...6)
+		// {
+			// nrs+=StringTools.hex(untyped __cpp__('(unsigned char)buffer.ifr_hwaddr.sa_data[s]'))+":";
+			// untyped __cpp__('
+				// for( s = 0; s < 6; s++ )
+				// {
+					// std::cout << (unsigned char)buffer.ifr_hwaddr.sa_data[s];
+				// }
+
+				// std::cout << std::endl;
+			// ');
+		// }		
+		// trace(nrs);
+
+		#end
 		return { ip:NativeString.fromPointer(ip), mac:NativeString.fromPointer(mac), hostname:Sys.getEnv("COMPUTERNAME") };
 	}
 
@@ -362,6 +432,8 @@ class WindowsUtils
 
 	/////////////////////////////////////////////////////////////////////////////////////
 
+	#if windows
+
 	@:native("SetSuspendState")					extern static public function setSuspendState(bHibernate:Bool=false,bForce:Bool,bWakeupEventsDisabled:Bool=false):Bool;
 	@:native("SetConsoleTitle")					extern static public function setConsoleTitle(title:String):Void;
 	@:native("FreeConsole")						extern static public function freeConsole():Bool;
@@ -376,6 +448,8 @@ class WindowsUtils
 	@:native("DeleteObject")					extern static public function deleteObject(ho:HBITMAP):Bool;
 	@:native("DeleteDC")						extern static public function deleteDC(hdc:HDC):Bool;
 	@:native("BitBlt")							extern static public function bitBlt(hdc:HDC,x:Int,y:Int,cx:Int,cy:Int,hdcSrc:HDC,x1:Int,y1:Int,rop:DWord):Bool;
+
+	#end
 
 	/////////////////////////////////////////////////////////////////////////////////////
 }
