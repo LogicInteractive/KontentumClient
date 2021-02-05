@@ -63,8 +63,6 @@ class KontentumClient
 		// utils.TrayUtils.createTrayIcon("KontentumClient  |  Logic Interactive");
 		
 		// WindowsUtils.takeScreenshot();
-		// return;
-
 		Loader.LoadXML("config.xml",null,onLoadXMLComplete,onLoadXMLFailed);
 	}
 

@@ -49,6 +49,7 @@ class ServerCommunicator
 	var restID						: String;
 	var restToken					: String;
 	var restURL						: String;
+	var restURLFirst				: String;
 	var restURLBase					: String;
 	var ipIsSent					: Bool;
 	var firstCommand				: String;
@@ -63,6 +64,7 @@ class ServerCommunicator
 	
 	var submitActionHttpReq			: HttpRequest;
 	var httpRequest					: HttpRequest;
+	var httpRequestFirst			: HttpRequest;
 	
 	var c							: ConfigXML;
 
@@ -93,11 +95,27 @@ class ServerCommunicator
 		}
 		else
 		{
-			restURL = restURLBase + "/" +  StringTools.urlEncode(adapter.ip) + "/" + StringTools.urlEncode(adapter.mac) + "/" + StringTools.urlEncode(adapter.hostname) + "/" + StringTools.urlEncode(KontentumClient.buildDate.toString());
-			httpRequest = new HttpRequest( { url:restURL, callback:onHttpResponse, callbackError:onHttpError });
+			var vol:Int = Math.round(WindowsUtils.getVolume()*100);
+			httpRequest = new HttpRequest( { url:restURLBase, callback:onHttpResponse, callbackError:onHttpError });
+			httpRequest.timeout = 30;
+
+			restURLFirst = restURLBase + "/" +  StringTools.urlEncode(adapter.ip) + "/" + StringTools.urlEncode(adapter.mac) + "/" + StringTools.urlEncode(adapter.hostname) + "/" + StringTools.urlEncode(KontentumClient.buildDate.toString()) + "/" + vol;
+			httpRequestFirst = new HttpRequest( { url:restURLFirst, callback:onHttpResponse, callbackError:onHttpError });
+			httpRequestFirst.timeout = 30;
 			// trace("REST: "+ restURL);
 			createTimer();
-			makeRequest();
+			
+			restStr = null;
+			try
+			{
+				waitForResponse = true;
+				httpRequestFirst.send();
+			}
+			catch (e:Dynamic)
+			{
+				if (KontentumClient.debug)
+					trace("First request error..");
+			}
 		}
 	}
 	
@@ -128,7 +146,7 @@ class ServerCommunicator
 			waitForResponse = true;
 			//http.request(false);
 			httpRequest = httpRequest.clone();
-			httpRequest.timeout = 30;
+			// httpRequest.timeout = 30;
 			httpRequest.send();
 		}
 		catch (e:Dynamic)
@@ -195,6 +213,8 @@ class ServerCommunicator
 				if (KontentumClient.debug)
 					trace("ResponseData : " + jsonPing);
 				
+
+				adjustParams(jsonPing);
 				KontentumClient.parseCommand(jsonPing);
 				
 				if (launch == null)
@@ -354,6 +374,19 @@ class ServerCommunicator
 
 	/////////////////////////////////////////////////////////////////////////////////////
 
+	function adjustParams(pingData:JSONPingData)
+	{
+		if (pingData.volume!=null || pingData.volume!=-1)
+		{
+			var newVol:Float = pingData.volume*0.01;
+			WindowsUtils.setVolume(newVol);
+			if (KontentumClient.debug)
+				trace("Setting volume to : "+pingData.volume);
+		}
+	}
+
+	/////////////////////////////////////////////////////////////////////////////////////
+
 	inline function isWeb(path:String):Bool
 	{
 		return (path!=null && (path.indexOf("http://")!=-1 || path.indexOf("https://")!=-1 || path.indexOf("file://")!=-1) );
@@ -371,6 +404,7 @@ typedef JSONPingData =
 	var success		: Bool;
 	var client		: Dynamic;
 	var sleep		: Bool;
+	var volume		: Null<Int>;
 }
 
 enum abstract SystemCommand(String) to String
@@ -402,6 +436,7 @@ typedef ClientInfo =
 	var download		: Null<Bool>;
 	var killexplorer	: Null<Bool>;
 	var debug			: Null<Bool>;
+	var volume			: Null<Int>;
 	var token			: String;
 	var exhibit_name	: String;
 }

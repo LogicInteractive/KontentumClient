@@ -42,12 +42,18 @@ typedef NetworkAdapterInfo =
 #include <iostream>
 #include <fstream>
 #include <string.h>
+#include <windows.h>
+#pragma comment(lib, "winmm")
 
 #pragma comment(lib, "PowrProf.lib")
 #include <powrprof.h>
 
 #pragma comment(lib, "iphlpapi.lib")
 #include <Iphlpapi.h>
+
+#include <endpointvolume.h>
+#include <mmdeviceapi.h>
+#pragma comment(lib, "Ole32")
 
 /*
 #ifndef max
@@ -392,6 +398,64 @@ struct ifreq ifr;
 
 	/////////////////////////////////////////////////////////////////////////////////////
 
+
+	static public function setVolume(newVolume:Float)
+	{		
+		untyped __cpp__('
+			HRESULT hr=NULL;
+
+			CoInitialize(NULL);
+			IMMDeviceEnumerator *deviceEnumerator = NULL; 
+			hr = CoCreateInstance(__uuidof(MMDeviceEnumerator), NULL, CLSCTX_INPROC_SERVER, __uuidof(IMMDeviceEnumerator), (LPVOID *)&deviceEnumerator);
+			IMMDevice *defaultDevice = NULL;
+
+			hr = deviceEnumerator->GetDefaultAudioEndpoint(eRender, eConsole, &defaultDevice);
+			deviceEnumerator->Release();
+			deviceEnumerator = NULL;
+
+			IAudioEndpointVolume *endpointVolume = NULL;
+			hr = defaultDevice->Activate(__uuidof(IAudioEndpointVolume), CLSCTX_INPROC_SERVER, NULL, (LPVOID *)&endpointVolume);
+			defaultDevice->Release();
+			defaultDevice = NULL;
+
+			hr = endpointVolume->SetMasterVolumeLevelScalar((float)newVolume, NULL);
+			endpointVolume->Release();
+
+			CoUninitialize();
+		');
+	}
+	
+	static public function getVolume():Float
+	{		
+		var rVolume:Float = -1;
+		untyped __cpp__('
+			HRESULT hr=NULL;
+
+			CoInitialize(NULL);
+			IMMDeviceEnumerator *deviceEnumerator = NULL; 
+			hr = CoCreateInstance(__uuidof(MMDeviceEnumerator), NULL, CLSCTX_INPROC_SERVER, __uuidof(IMMDeviceEnumerator), (LPVOID *)&deviceEnumerator);
+			IMMDevice *defaultDevice = NULL;
+
+			hr = deviceEnumerator->GetDefaultAudioEndpoint(eRender, eConsole, &defaultDevice);
+			deviceEnumerator->Release();
+			deviceEnumerator = NULL;
+
+			IAudioEndpointVolume *endpointVolume = NULL;
+			hr = defaultDevice->Activate(__uuidof(IAudioEndpointVolume), CLSCTX_INPROC_SERVER, NULL, (LPVOID *)&endpointVolume);
+			defaultDevice->Release();
+			defaultDevice = NULL;
+
+			float currentVolume = 0;
+			endpointVolume->GetMasterVolumeLevel(&currentVolume);
+			hr = endpointVolume->GetMasterVolumeLevelScalar(&currentVolume);
+			endpointVolume->Release();
+
+			CoUninitialize();
+			rVolume = (Float)currentVolume;
+		');
+		return rVolume;
+	}
+
 	static public function takeScreenshot()
 	{
 		/*
@@ -448,7 +512,6 @@ struct ifreq ifr;
 	@:native("DeleteObject")					extern static public function deleteObject(ho:HBITMAP):Bool;
 	@:native("DeleteDC")						extern static public function deleteDC(hdc:HDC):Bool;
 	@:native("BitBlt")							extern static public function bitBlt(hdc:HDC,x:Int,y:Int,cx:Int,cy:Int,hdcSrc:HDC,x1:Int,y1:Int,rop:DWord):Bool;
-
 	#end
 
 	/////////////////////////////////////////////////////////////////////////////////////

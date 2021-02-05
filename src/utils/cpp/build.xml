@@ -6,6 +6,7 @@
 		<compilervalue name="-I" value="${CPP_DIR}/include/" />
 	</files> -->
 	<target id='haxe' tool='linker' toolid='exe'>
+		<lib name='${this_dir}/Ole32.Lib' if='windows'/>
 		<lib name='${this_dir}/Shell32.Lib' if='windows'/>
 	</target>
 	
