@@ -125,8 +125,9 @@ class ServerCommunicator
 		if (pingTimer != null)
 			pingTimer.stop();
 			
-		pingTimer = new Timer(Std.int(c.kontentum.interval*1000));
-		pingTimer.run = pingCallback;		
+		var newPingTime:Int = Std.int(c.kontentum.interval*1000);
+		pingTimer = new Timer(newPingTime);
+		pingTimer.run = pingCallback;	
 	}
 	
 	@:keep
@@ -376,7 +377,7 @@ class ServerCommunicator
 
 	function adjustParams(pingData:JSONPingData)
 	{
-		if (pingData.volume!=null || pingData.volume!=-1)
+		if (pingData.volume!=null && pingData.volume!=-1)
 		{
 			var newVol:Float = pingData.volume*0.01;
 			WindowsUtils.setVolume(newVol);

@@ -38,10 +38,7 @@
 				"showReuseMessage": true,
 				"clear": false,
 			},
-			"group":{
-				"kind": "build",
-				"isDefault": true
-			},
+			"group": "build",
 			"dependsOn": [
 				"d"
 			],
@@ -81,7 +78,10 @@
 				"showReuseMessage": true,
 				"clear": false
 			},
-			"group": "build",
+			"group":{
+				"kind": "build",
+				"isDefault": true
+			},
 			"dependsOn": [
 				"r"
 			],
