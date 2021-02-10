@@ -60,6 +60,7 @@ class ServerCommunicator
 	var http						: Http;
 	var restStr						: String;
 	var waitForResponse				: Bool;
+	var timerDirty					: Bool;
 	var pingTimer					: Timer;
 	
 	var submitActionHttpReq			: HttpRequest;
@@ -79,7 +80,7 @@ class ServerCommunicator
 	public function new() 
 	{
 		c = KontentumClient.config;
-		
+		timerDirty = false;
 		restURLBase = c.kontentum.ip+'/'+c.kontentum.api+'/'+c.kontentum.clientID+'/'+c.kontentum.exhibitToken;
 		submitActionHttpReq = new HttpRequest( { url:c.kontentum.ip, callback:onSubmitActionHttpResponse });		
 	}
@@ -119,24 +120,48 @@ class ServerCommunicator
 		}
 	}
 	
-	@:keep
-	function createTimer() 
+	function createTimer()
 	{
 		if (pingTimer != null)
 			pingTimer.stop();
-			
-		var newPingTime:Int = Std.int(c.kontentum.interval*1000);
-		pingTimer = new Timer(newPingTime);
+
+		pingTimer = new Timer(Std.int(c.kontentum.interval*1000));
 		pingTimer.run = pingCallback;	
 	}
-	
+
 	@:keep
 	function pingCallback() 
 	{
+		if (timerDirty)
+		{
+			if (pingTimer != null)
+				pingTimer.stop();
+
+			if (KontentumClient.debug)
+				trace("Changing ping time to : " + c.kontentum.interval);
+				
+			pingTimer = new Timer(Std.int(c.kontentum.interval*1000));
+			pingTimer.run = pingCallback;	
+			timerDirty = false;
+		}
+		
 		if (!waitForResponse && KontentumClient.ready)
 			makeRequest();
 	}
 
+	// @:keep
+	// function createTimer() 
+	// {
+	// 	// if (pingTimer != null)
+	// 		// pingTimer.stop();
+
+	// 	// var newPingTime:Int = Std.int(c.kontentum.interval*1000);
+	// 	// pingTimer = new Timer(newPingTime);
+	// 	// Timer.delay(()->trace("hmm"),500);
+	// 	// pingTimer.run = pingCallback;	
+	// 	// pingTimer.run = ()->{trace("hey");};	
+	// }
+	
 	function makeRequest() 
 	{
 		if (KontentumClient.debug)
@@ -260,10 +285,8 @@ class ServerCommunicator
 				var newPing:Float = jsonPing.ping;
 				if (newPing != KontentumClient.config.kontentum.interval)
 				{
-					if (KontentumClient.debug)
-						trace("Changing ping time to : " + newPing);
 					KontentumClient.config.kontentum.interval = newPing;
-					createTimer();
+					timerDirty = true;
 				}
 			}
 		}
@@ -330,7 +353,6 @@ class ServerCommunicator
 			}		
 		}		
 	}		
-
 
 	/////////////////////////////////////////////////////////////////////////////////////
 

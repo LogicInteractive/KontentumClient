@@ -60,6 +60,7 @@ class KontentumClient
 		#end
 		printLogo();
 		checkOldUpdate();
+
 		// utils.TrayUtils.createTrayIcon("KontentumClient  |  Logic Interactive");
 		
 		// WindowsUtils.takeScreenshot();
