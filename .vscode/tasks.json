@@ -36,7 +36,7 @@
 				"focus": false,
 				"panel": "shared",
 				"showReuseMessage": true,
-				"clear": false,
+				"clear": false
 			},
 			"group": "build",
 			"dependsOn": [
@@ -78,7 +78,7 @@
 				"showReuseMessage": true,
 				"clear": false
 			},
-			"group":{
+			"group": {
 				"kind": "build",
 				"isDefault": true
 			},

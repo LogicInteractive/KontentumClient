@@ -165,10 +165,11 @@ class WindowsUtils
 		if (subProcess!=null)
 			subProcess.forceQuitNoRestart();
 			
-		//#if win
-		//trace("REBOOT");
+		#if windows
 		Sys.command("shutdown", ["/r", "/f", "/t", "0"]);
-		//#elseif mac
+		#elseif (linux || mac)
+		Sys.command("sudo reboot");
+		#end
 		
 		//#end
 	}
@@ -178,12 +179,11 @@ class WindowsUtils
 		if (subProcess!=null)
 			subProcess.forceQuitNoRestart();
 
-		//#if win
-		//trace("SHUTDOWN");
+		#if windows
 		Sys.command("shutdown",["/s","/f","/t","0"]);
-		//#elseif mac
-		//
-		//#end
+		#elseif (linux || mac)
+		Sys.command("sudo shutdown");
+		#end
 	}
 	
 	static public function systemSleep(bHibernate:Bool=false,bWakeupEventsDisabled:Bool=false)
@@ -401,6 +401,7 @@ struct ifreq ifr;
 
 	static public function setVolume(newVolume:Float)
 	{		
+		#if windows
 		untyped __cpp__('
 			HRESULT hr=NULL;
 
@@ -423,11 +424,18 @@ struct ifreq ifr;
 
 			CoUninitialize();
 		');
+		#elseif linux
+		var pstVol:Int = Std.int(newVolume*100);
+		//Requires alsa-utils to be installed : "sudo apt-get install alsa-utils"
+		Sys.command('amixer set Master $pstVol%');
+		#end
 	}
 	
 	static public function getVolume():Float
 	{		
 		var rVolume:Float = -1;
+		
+		#if windows
 		untyped __cpp__('
 			HRESULT hr=NULL;
 
@@ -453,6 +461,10 @@ struct ifreq ifr;
 			CoUninitialize();
 			rVolume = (Float)currentVolume;
 		');
+		#elseif linux
+		//Requires alsa-utils to be installed : "sudo apt-get install alsa-utils"
+		rVolume = Sys.command('amixer get Master')*0.01;
+		#end
 		return rVolume;
 	}
 

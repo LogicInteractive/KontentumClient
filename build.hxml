@@ -1,15 +1,28 @@
+###############################################
+
 -cp src
 -main KontentumClient
--cp c:/dev/fox/common
--cp c:/dev/fox/thirdparty/common
 --cpp bin/build
 -D HXCPP_STACK_TRACE
 -D HXCPP_STACK_LINE
 -D HXCPP_CHECK_POINTER
 -D HXCPP_M64
--D windows
 --times
 --resource bin/ClientUpdater.exe@updater
+
+###############################################
+
+#Windows 
+# -D windows
+# -cp c:/dev/fox/common
+# -cp c:/dev/fox/thirdparty/common
+
+#Linux
+-cp /mnt/c/dev/fox/common
+-cp /mnt/c/dev/fox/thirdparty/common
+-D linux
+
+###############################################
 
 ### ClientUpdater
 #-cp clientUpdaterSrc
@@ -18,3 +31,5 @@
 #-dce full
 #-D analyzer-optimize
 #-D HXCPP_M64
+
+###############################################
