@@ -8,7 +8,7 @@
 		<localFiles></localFiles>
 	</kontentum>
 	<killexplorer>false</killexplorer> 
-	<debug>true</debug> 
+	<debug>false</debug> 
 	<overridelaunch></overridelaunch> 
 </config>
 

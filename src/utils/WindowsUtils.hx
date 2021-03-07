@@ -193,7 +193,7 @@ class WindowsUtils
 		#if windows
 		Sys.command("shutdown",["/s","/f","/t","0"]);
 		#elseif (linux || mac)
-		Sys.command("sudo shutdown");
+		Sys.command("sudo shutdown -P now");
 		#end
 	}
 	
