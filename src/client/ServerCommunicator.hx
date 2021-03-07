@@ -100,6 +100,9 @@ class ServerCommunicator
 			httpRequest = new HttpRequest( { url:restURLBase, callback:onHttpResponse, callbackError:onHttpError });
 			httpRequest.timeout = 30;
 
+			if (KontentumClient.debug)
+				trace("Local IP: "+adapter.ip+" | Mac-adress: "+adapter.mac+" | Hostname:"+adapter.hostname);			
+
 			restURLFirst = restURLBase + "/" +  StringTools.urlEncode(adapter.ip) + "/" + StringTools.urlEncode(adapter.mac) + "/" + StringTools.urlEncode(adapter.hostname) + "/" + StringTools.urlEncode(KontentumClient.buildDate.toString()) + "/" + vol;
 			httpRequestFirst = new HttpRequest( { url:restURLFirst, callback:onHttpResponse, callbackError:onHttpError });
 			httpRequestFirst.timeout = 30;

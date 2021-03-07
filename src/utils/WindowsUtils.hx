@@ -22,6 +22,7 @@ import no.logic.fox.hwintegration.windows.Chrome;
 import sys.FileSystem;
 import sys.io.File;
 import sys.io.FileOutput;
+import sys.net.Host;
 
 
 /**
@@ -138,16 +139,26 @@ using namespace std;
 //   return (stat == Gdiplus::Ok) ? 0 : 1;
 // }
 ')
-#else//if linux
+#elseif linux
 @:cppFileCode('
 #include <stdio.h>
 #include <sys/ioctl.h>
 #include <sys/types.h>
 #include <sys/socket.h>
-#include <net/if.h>
+#include <string.h>
 #include <iostream>
+#include <netdb.h>
+#include <sys/param.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <fstream>
+#include <ifaddrs.h>
+#include <net/if.h> 
+#include <unistd.h>
+#include <netpacket/packet.h>
 ')
 #end
+//@:buildXml('<include name="../../src/utils/cpp/build.xml" />')
 class WindowsUtils
 {
 	/////////////////////////////////////////////////////////////////////////////////////
@@ -295,9 +306,10 @@ class WindowsUtils
 
 	static public function getNetworkAdapterInfo(adaptertype:Int):NetworkAdapterInfo
 	{
+		#if windows
 		var ip:ConstPointer<Char> = null;
 		var mac:ConstPointer<Char> = null;
-		#if windows
+
 		untyped __cpp__('
 		
 			PIP_ADAPTER_INFO AdapterInfo;
@@ -339,61 +351,72 @@ class WindowsUtils
 			}
 			free(AdapterInfo);
 		');
-		#else//if Linux
-
-/* 		var nrs:String ="";
-
-		untyped __cpp__('
-			// int s;
-			// struct ifreq buffer;
-
-			// s = socket(PF_INET, SOCK_DGRAM, 0);
-
-			// memset(&buffer, 0x00, sizeof(buffer));
-			
-			// strcpy(buffer.ifr_name, "eth0");
-
-			// ioctl(s, SIOCGIFHWADDR, &buffer);
-
-			// close(s);
-
-struct ifreq ifr;
-  int s;
-  if ((s = socket(AF_INET, SOCK_STREAM,0)) < 0) {
-    perror("socket");
-    return -1;
-  }
-  
-  strcpy(ifr.ifr_name, "eth0");
-  if (ioctl(s, SIOCGIFHWADDR, &ifr) < 0) {
-    perror("ioctl");
-    return -1;
-  }
-  
-  unsigned char *hwaddr = (unsigned char *)ifr.ifr_hwaddr.sa_data;
-  printf("%02X:%02X:%02X:%02X:%02X:%02X\\n", hwaddr[0], hwaddr[1], hwaddr[2],
-                                          hwaddr[3], hwaddr[4], hwaddr[5]);
-  close(s);
-
-
-		'); */
-
-		// for (s in 0...6)
-		// {
-			// nrs+=StringTools.hex(untyped __cpp__('(unsigned char)buffer.ifr_hwaddr.sa_data[s]'))+":";
-			// untyped __cpp__('
-				// for( s = 0; s < 6; s++ )
-				// {
-					// std::cout << (unsigned char)buffer.ifr_hwaddr.sa_data[s];
-				// }
-
-				// std::cout << std::endl;
-			// ');
-		// }		
-		// trace(nrs);
-
-		#end
 		return { ip:NativeString.fromPointer(ip), mac:NativeString.fromPointer(mac), hostname:Sys.getEnv("COMPUTERNAME") };
+		#elseif linux
+
+		var ip:String = "";
+		var mac:String = "";
+
+		// Get Local IP
+		untyped __cpp__('
+			struct ifaddrs * ifAddrStruct=NULL;
+			struct ifaddrs * ifa=NULL;
+			void * tmpAddrPtr=NULL;
+
+			getifaddrs(&ifAddrStruct);
+
+			for (ifa = ifAddrStruct; ifa != NULL; ifa = ifa->ifa_next)
+			{
+				if (!ifa->ifa_addr)
+				{
+					continue;
+				}
+				if (ifa->ifa_addr->sa_family == AF_INET) //IP4
+				{
+					tmpAddrPtr=&((struct sockaddr_in *)ifa->ifa_addr)->sin_addr;
+					char addressBuffer[INET_ADDRSTRLEN];
+					inet_ntop(AF_INET, tmpAddrPtr, addressBuffer, INET_ADDRSTRLEN);
+					ip = addressBuffer;
+				}
+			}
+			if (ifAddrStruct!=NULL) 
+				freeifaddrs(ifAddrStruct);
+		');
+
+		// Find mac adress
+		var foundMac:Bool = false;
+		untyped __cpp__('
+			int fd;
+			struct ifreq ifr;
+			char const *iface = "enp0s3";
+			unsigned char *maca = NULL;
+
+			memset(&ifr, 0, sizeof(ifr));
+			fd = socket(AF_INET, SOCK_DGRAM, 0);
+			ifr.ifr_addr.sa_family = AF_INET;
+			strncpy(ifr.ifr_name , iface , IFNAMSIZ-1);
+
+			if (0 == ioctl(fd, SIOCGIFHWADDR, &ifr))
+			{
+				maca = (unsigned char *)ifr.ifr_hwaddr.sa_data;
+				foundMac=true;
+			}
+			close(fd);
+		');
+		if (foundMac)
+		{
+			mac=StringTools.hex(untyped __cpp__('maca[0]'),2);
+			mac+=":"+StringTools.hex(untyped __cpp__('maca[1]'),2);
+			mac+=":"+StringTools.hex(untyped __cpp__('maca[2]'),2);
+			mac+=":"+StringTools.hex(untyped __cpp__('maca[3]'),2);
+			mac+=":"+StringTools.hex(untyped __cpp__('maca[4]'),2);
+			mac+=":"+StringTools.hex(untyped __cpp__('maca[5]'),2);
+		}
+
+		return { ip:ip, mac:mac, hostname:Host.localhost() };
+		#else
+		return { ip:"", mac:"", hostname:"" };
+		#end
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////
@@ -425,11 +448,14 @@ struct ifreq ifr;
 			CoUninitialize();
 		');
 		#elseif linux
-		var pstVol:Int = Std.int(newVolume*100);
+		var pstVol:Int = Std.int(newVolume*31);
 		//Requires alsa-utils to be installed : "sudo apt-get install alsa-utils"
-		Sys.command('amixer set Master $pstVol%');
+		Sys.command('amixer --quiet set Master $pstVol');
 		#end
 	}
+
+
+	
 	
 	static public function getVolume():Float
 	{		
@@ -463,7 +489,7 @@ struct ifreq ifr;
 		');
 		#elseif linux
 		//Requires alsa-utils to be installed : "sudo apt-get install alsa-utils"
-		rVolume = Sys.command('amixer get Master')*0.01;
+		rVolume = Std.parseFloat(new sys.io.Process("amixer -D pulse get Master | awk -F 'Left:|[][]' 'BEGIN "+'{RS=""} '+"{ print $3 }'", []).stdout.readAll().toString().split("%").join(""));
 		#end
 		return rVolume;
 	}

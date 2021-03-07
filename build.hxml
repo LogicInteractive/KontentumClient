@@ -18,8 +18,8 @@
 # -cp c:/dev/fox/thirdparty/common
 
 #Linux
--cp /mnt/c/dev/fox/common
--cp /mnt/c/dev/fox/thirdparty/common
+-cp /home/tommy/dev/fox/common
+-cp /home/tommy/dev/fox/thirdparty/common
 -D linux
 
 ###############################################

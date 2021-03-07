@@ -1,0 +1,8 @@
+::::: make script executable
+
+sudo chmod +x runKontentumClient.sh
+sudo chmod +x KontentumClient
+
+::::: edit : /etc/rc.local
+
+sudo /home/<user>/KontentumClient/runKontentumClient.sh

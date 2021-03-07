@@ -64,7 +64,18 @@ class KontentumClient
 		// utils.TrayUtils.createTrayIcon("KontentumClient  |  Logic Interactive");
 		
 		// WindowsUtils.takeScreenshot();
-		Loader.LoadXML("config.xml",null,onLoadXMLComplete,onLoadXMLFailed);
+
+		var pDir:String = "";
+		#if linux
+		var appDir = Sys.programPath();
+		if (appDir.split("KontentumClient").length > 1)
+		{
+			var si:Int = appDir.lastIndexOf("KontentumClient");
+			appDir = appDir.substring(0, si);
+			pDir = appDir.split("\\").join("/");
+		}
+		#end
+		Loader.LoadXML(pDir+"config.xml",null,onLoadXMLComplete,onLoadXMLFailed);
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////
