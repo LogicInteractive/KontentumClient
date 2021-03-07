@@ -3,6 +3,8 @@
 sudo chmod +x runKontentumClient.sh
 sudo chmod +x KontentumClient
 
-::::: edit : /etc/rc.local
+::::: edit : /etc/rc.local - Set script to run in background
 
-sudo /home/<user>/KontentumClient/runKontentumClient.sh
+::::: rc.local must have " #!/bin/bash " at top line (if file was empty)
+
+sudo /home/<user>/KontentumClient/runKontentumClient.sh &
