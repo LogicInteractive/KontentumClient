@@ -6,6 +6,7 @@
 		<exhibitToken>s3sxqb</exhibitToken> 
 		<download>false</download>
 		<localFiles></localFiles>
+		<delay>3</delay>
 	</kontentum>
 	<killexplorer>false</killexplorer> 
 	<debug>true</debug> 

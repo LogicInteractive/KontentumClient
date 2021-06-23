@@ -10,13 +10,13 @@ import cpp.ConstPointer;
 import cpp.Lib;
 import cpp.NativeString;
 import cpp.RawConstPointer;
+import fox.kontentum.Kontentum;
 import haxe.CallStack;
 import haxe.Http;
 import haxe.Json;
 import haxe.Timer;
 import haxe.io.Output;
 import haxe.macro.Expr.Error;
-import no.logic.fox.kontentum.Kontentum;
 import sys.FileSystem;
 import sys.io.File;
 import sys.io.FileOutput;
@@ -104,8 +104,8 @@ class ServerCommunicator
 				trace("Local IP: "+adapter.ip+" | Mac-adress: "+adapter.mac+" | Hostname:"+adapter.hostname);			
 
 			restURLFirst = restURLBase + "/" +  StringTools.urlEncode(adapter.ip) + "/" + StringTools.urlEncode(adapter.mac) + "/" + StringTools.urlEncode(adapter.hostname) + "/" + StringTools.urlEncode(KontentumClient.buildDate.toString()) + "/" + vol;
-			httpRequestFirst = new HttpRequest( { url:restURLFirst, callback:onHttpResponse, callbackError:onHttpError });
-			httpRequestFirst.timeout = 30;
+			httpRequestFirst = new HttpRequest( { url:restURLFirst, callback:onHttpResponse, callbackError:onHttpFirstError });
+			httpRequestFirst.timeout = 60*3;
 			// trace("REST: "+ restURL);
 			createTimer();
 			
@@ -319,6 +319,22 @@ class ServerCommunicator
 		// no valid data...
 		Sys.sleep(10);
 		requestComplete();
+	}
+
+	function onHttpFirstError(response:HttpResponse) 
+	{
+		if (KontentumClient.debug)
+		{
+			trace("HTTP error: "+response.toString());
+			trace("Will retry connection...");
+		}
+
+		httpRequestFirst = httpRequestFirst.clone();
+		httpRequestFirst.send();
+			
+		if (launch == null)
+			launchOffline();
+			
 	}
 
 	function onHttpError(response:HttpResponse) 

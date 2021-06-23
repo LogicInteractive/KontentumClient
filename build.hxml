@@ -13,14 +13,14 @@
 ###############################################
 
 #Windows 
-# -D windows
-# -cp c:/dev/fox/common
-# -cp c:/dev/fox/thirdparty/common
+-D windows
+-cp c:/dev/fox/fox/hx
+-cp c:/dev/fox/thirdparty/common
 
 #Linux
--cp /mnt/c/dev/fox/common
--cp /mnt/c/dev/fox/thirdparty/common
--D linux
+#-cp /mnt/c/dev/fox/common
+#-cp /mnt/c/dev/fox/thirdparty/common
+#-D linux
 
 ###############################################
 

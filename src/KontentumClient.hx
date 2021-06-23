@@ -1,15 +1,15 @@
 package;
 
 import client.ServerCommunicator;
+import fox.compile.CompileTime;
+import fox.kontentum.Kontentum;
+import fox.loader.Loader;
+import fox.native.windows.Chrome;
+import fox.utils.DateUtils;
+import fox.utils.ObjUtils;
 import haxe.Resource;
 import haxe.io.Bytes;
 import haxe.macro.Expr.Catch;
-import hxbitmini.CompileTime;
-import no.logic.fox.hwintegration.windows.Chrome;
-import no.logic.fox.kontentum.Kontentum;
-import no.logic.fox.loader.Loader;
-import no.logic.fox.utils.DateUtils;
-import no.logic.fox.utils.ObjUtils;
 import sys.FileSystem;
 import sys.io.File;
 import utils.WindowsUtils;

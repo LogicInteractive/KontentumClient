@@ -1,7 +1,7 @@
 package utils;
 
+import fox.native.windows.WindowsSystemUtils;
 import haxe.Timer;
-import no.logic.fox.hwintegration.windows.WindowsSystemUtils;
 
 /**
  * ...
