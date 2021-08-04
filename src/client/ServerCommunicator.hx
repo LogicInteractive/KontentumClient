@@ -242,15 +242,14 @@ class ServerCommunicator
 				if (KontentumClient.debug)
 					trace("ResponseData : " + jsonPing);
 				
-
 				adjustParams(jsonPing);
 				KontentumClient.parseCommand(jsonPing);
 				
-				if (launch == null)
+				if (launch == null && KontentumClient.ready)
 				{
 					if (jsonPing.launch!=null && jsonPing.launch!="")
 						launch = jsonPing.launch;
-						
+
 					if (KontentumClient.config.overridelaunch!=null)
 						launch = KontentumClient.config.overridelaunch;
 					else 
