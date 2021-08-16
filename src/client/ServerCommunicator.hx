@@ -21,6 +21,7 @@ import sys.FileSystem;
 import sys.io.File;
 import sys.io.FileOutput;
 import utils.WindowsUtils;
+import fox.utils.Convert;
 
 /**
  * ...
@@ -66,6 +67,9 @@ class ServerCommunicator
 	var submitActionHttpReq			: HttpRequest;
 	var httpRequest					: HttpRequest;
 	var httpRequestFirst			: HttpRequest;
+
+	var forceRebulidCache			: Bool				= false;
+	var downloadAllFiles			: Bool				= false;
 	
 	var c							: ConfigXML;
 
@@ -81,7 +85,7 @@ class ServerCommunicator
 	{
 		c = KontentumClient.config;
 		timerDirty = false;
-		restURLBase = c.kontentum.ip+'/'+c.kontentum.api+'/'+c.kontentum.clientID+'/'+c.kontentum.exhibitToken;
+		restURLBase = c.kontentum.ip+'/'+c.kontentum.api+'/'+c.kontentum.clientID+'/'+c.kontentum.exhibitToken+'/'+Convert.toBool(forceRebulidCache)+'/'+Convert.toBool(downloadAllFiles);
 		submitActionHttpReq = new HttpRequest( { url:c.kontentum.ip, callback:onSubmitActionHttpResponse });		
 	}
 	
