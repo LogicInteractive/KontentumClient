@@ -1,6 +1,7 @@
 package client;
 
 import KontentumClient.ConfigXML;
+import com.akifox.asynchttp.AsyncHttp;
 import com.akifox.asynchttp.HttpRequest;
 import com.akifox.asynchttp.HttpResponse;
 import com.akifox.asynchttp.URL;
@@ -11,6 +12,7 @@ import cpp.Lib;
 import cpp.NativeString;
 import cpp.RawConstPointer;
 import fox.kontentum.Kontentum;
+import fox.utils.Convert;
 import haxe.CallStack;
 import haxe.Http;
 import haxe.Json;
@@ -21,7 +23,6 @@ import sys.FileSystem;
 import sys.io.File;
 import sys.io.FileOutput;
 import utils.WindowsUtils;
-import fox.utils.Convert;
 
 /**
  * ...
@@ -83,9 +84,10 @@ class ServerCommunicator
 	
 	public function new() 
 	{
+		AsyncHttp.logErrorEnabled = false;
 		c = KontentumClient.config;
 		timerDirty = false;
-		restURLBase = c.kontentum.ip+'/'+c.kontentum.api+'/'+c.kontentum.clientID+'/'+c.kontentum.exhibitToken+'/'+Convert.toBool(forceRebulidCache)+'/'+Convert.toBool(downloadAllFiles);
+		restURLBase = c.kontentum.ip+'/'+c.kontentum.api+'/'+c.kontentum.clientID+'/'+c.kontentum.exhibitToken;
 		submitActionHttpReq = new HttpRequest( { url:c.kontentum.ip, callback:onSubmitActionHttpResponse });		
 	}
 	
@@ -108,7 +110,7 @@ class ServerCommunicator
 				trace("Local IP: "+adapter.ip+" | Mac-adress: "+adapter.mac+" | Hostname:"+adapter.hostname);			
 
 			restURLFirst = restURLBase + "/" +  StringTools.urlEncode(adapter.ip) + "/" + StringTools.urlEncode(adapter.mac) + "/" + StringTools.urlEncode(adapter.hostname) + "/" + StringTools.urlEncode(KontentumClient.buildDate.toString()) + "/" + vol;
-			httpRequestFirst = new HttpRequest( { url:restURLFirst, callback:onHttpResponse, callbackError:onHttpFirstError });
+			httpRequestFirst = new HttpRequest( { url:restURLFirst, callback:onHttpResponseFirst, callbackError:onHttpFirstError });
 			httpRequestFirst.timeout = 60*3;
 			// trace("REST: "+ restURL);
 			createTimer();
@@ -194,6 +196,26 @@ class ServerCommunicator
 		waitForResponse = false;
 	}
 	
+	function onHttpResponseFirst(response:HttpResponse)
+	{
+		if (response.isOK)
+		{
+			if (response.content != null)
+			{
+				if (KontentumClient.downloadFiles)
+					KontentumClient.i.startFileDownload();
+
+				requestComplete();
+
+			}
+			// else
+				// onPingCorruptData(response);
+		}
+		else
+			onHttpFirstError(response);
+			// onPingError(response);
+	}
+
 	function onHttpResponse(response:HttpResponse)
 	{
 		if (response.isOK)
@@ -205,7 +227,6 @@ class ServerCommunicator
 		}
 		else
 			onPingError(response);
-			
 	}  
 			
 	function onPingData(response:HttpResponse) 

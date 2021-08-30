@@ -29,7 +29,7 @@ class KontentumClient
 {
 	/////////////////////////////////////////////////////////////////////////////////////
 
-	static var i						: KontentumClient;
+	static public var i					: KontentumClient;
 	static public var config			: ConfigXML;
 	static public var buildDate			: Date				= CompileTime.buildDate();
 	static public var ready				: Bool				= false;
@@ -104,8 +104,6 @@ class KontentumClient
 		if (config.kontentum.download==true)
 		{
 			KontentumClient.downloadFiles = config.kontentum.download;
-			if (KontentumClient.downloadFiles)
-				startFileDownload();
 		}
 		else 
 			KontentumClient.ready = true;
@@ -246,7 +244,7 @@ class KontentumClient
 
 	/////////////////////////////////////////////////////////////////////////////////////
 
-	function startFileDownload()
+	public function startFileDownload()
 	{
 		var bDate:String = DateUtils.getFormattedDate(KontentumClient.buildDate);
 		// WindowsUtils.allocConsole();
@@ -277,9 +275,11 @@ class KontentumClient
 	function onKontentumReady()
 	{
 		// trace("Kontenum ready! ");//+Kontentum.RESTJsonStr);
+
 		ready = true;
 		#if windows
-		WindowsUtils.freeConsole();		
+		if (!debug)
+			WindowsUtils.freeConsole();		
 		#end
 	}
 	
