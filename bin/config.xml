@@ -6,11 +6,14 @@
 		<exhibitToken>s3sxqb</exhibitToken> 
 		<download>false</download>
 		<localFiles></localFiles>
-		<delay>3</delay>
+		<delay>0</delay>
+		<hosted>
+			<api>rest/getHosted</api>
+			<folder>vikingtidsmuseet</folder>
+			<localpath>c:/logic/vikingtidsmuseet_test</localpath>
+		</hosted>
 	</kontentum>
 	<killexplorer>false</killexplorer> 
 	<debug>true</debug> 
 	<overridelaunch></overridelaunch> 
 </config>
-
-

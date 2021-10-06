@@ -7,6 +7,9 @@
 -D HXCPP_STACK_LINE
 -D HXCPP_CHECK_POINTER
 -D HXCPP_M64
+# -D HXCPP_GC_DYNAMIC_SIZE
+# -D HXCPP_GC_BIG_BLOCKS
+# -D HXCPP_CPP11
 --times
 --resource bin/ClientUpdater.exe@updater
 

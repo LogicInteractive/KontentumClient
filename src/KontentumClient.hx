@@ -1,5 +1,6 @@
 package;
 
+import client.HostedFileSync;
 import client.ServerCommunicator;
 import fox.compile.CompileTime;
 import fox.kontentum.Kontentum;
@@ -7,6 +8,7 @@ import fox.loader.Loader;
 import fox.native.windows.Chrome;
 import fox.utils.DateUtils;
 import fox.utils.ObjUtils;
+import fox.utils.Tick;
 import haxe.Resource;
 import haxe.io.Bytes;
 import haxe.macro.Expr.Catch;
@@ -100,6 +102,10 @@ class KontentumClient
 		}
 
 		initSettings();
+		HostedFileSync.init();
+		Tick.idle();
+		return;
+		
 		ServerCommunicator.init();
 		if (config.kontentum.download==true)
 		{
@@ -405,4 +411,12 @@ typedef KontentumConfig =
 	var restartdelay		: Float;
 	var download			: Null<Bool>;
 	var localFiles			: String;
+	var hosted				: HostedFileSyncConfig;
+}
+
+typedef HostedFileSyncConfig =
+{
+	var api					: String;
+	var folder				: String;
+	var localpath			: String;
 }
