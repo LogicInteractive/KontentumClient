@@ -104,7 +104,6 @@ class KontentumClient
 		initSettings();
 		HostedFileSync.init();
 		Tick.idle();
-		return;
 		
 		ServerCommunicator.init();
 		if (config.kontentum.download==true)
@@ -265,7 +264,7 @@ class KontentumClient
 		if(config.kontentum.localFiles!=null && config.kontentum.localFiles!="")
 			localFileCache = config.kontentum.localFiles;
 
-		Kontentum.connect(config.kontentum.exhibitToken,null,localFileCache,true,false,false,true);
+		Kontentum.connect(config.kontentum.exhibitToken,config.kontentum.ip,localFileCache,true,false,false,true);
 	}
 
 	function onKontentumDownloadProgress()

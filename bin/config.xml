@@ -1,19 +1,17 @@
 <config>
 	<kontentum>
 		<ip>https://kontentum.link</ip>
-		<api>rest/pingClient</api> 
-		<clientID>344</clientID> 
-		<exhibitToken>s3sxqb</exhibitToken> 
-		<download>false</download>
-		<localFiles></localFiles>
-		<delay>0</delay>
-		<hosted>
-			<api>rest/getHosted</api>
-			<folder>vikingtidsmuseet</folder>
-			<localpath>c:/logic/vikingtidsmuseet_test</localpath>
-		</hosted>
+		<api>rest/pingClient</api>
+		<clientID>551</clientID>
+		<exhibitToken>84l1dr</exhibitToken>
+		<download>true</download>
+		<localFiles>c:/Logic/files</localFiles>
+		<forceRebuildCache>false</forceRebuildCache>
+		<downloadAllFiles>false</downloadAllFiles>
+		<delay>5</delay>
 	</kontentum>
-	<killexplorer>false</killexplorer> 
-	<debug>true</debug> 
-	<overridelaunch></overridelaunch> 
+	<killexplorer>false</killexplorer>
+	<debug>true</debug>
+	<overridelaunch></overridelaunch>
+	<chrome>C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe</chrome>
 </config>

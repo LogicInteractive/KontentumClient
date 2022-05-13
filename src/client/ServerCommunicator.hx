@@ -112,7 +112,7 @@ class ServerCommunicator
 			restURLFirst = restURLBase + "/" +  StringTools.urlEncode(adapter.ip) + "/" + StringTools.urlEncode(adapter.mac) + "/" + StringTools.urlEncode(adapter.hostname) + "/" + StringTools.urlEncode(KontentumClient.buildDate.toString()) + "/" + vol;
 			httpRequestFirst = new HttpRequest( { url:restURLFirst, callback:onHttpResponseFirst, callbackError:onHttpFirstError });
 			httpRequestFirst.timeout = 60*3;
-			// trace("REST: "+ restURL);
+			trace("REST: "+ restURL);
 			createTimer();
 			
 			restStr = null;
@@ -275,7 +275,7 @@ class ServerCommunicator
 					if (jsonPing.launch!=null && jsonPing.launch!="")
 						launch = jsonPing.launch;
 
-					if (KontentumClient.config.overridelaunch!=null)
+					if (KontentumClient.config.overridelaunch!=null && KontentumClient.config.overridelaunch!="")
 						launch = KontentumClient.config.overridelaunch;
 					else 
 						KontentumClient.cacheLaunchFile(launch);
@@ -355,6 +355,8 @@ class ServerCommunicator
 
 		httpRequestFirst = httpRequestFirst.clone();
 		httpRequestFirst.send();
+
+		trace(launch);
 			
 		if (launch == null)
 			launchOffline();
