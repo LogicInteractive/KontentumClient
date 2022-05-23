@@ -32,7 +32,7 @@ class HostedFileSync
 
     static public function init():Bool
 	{
-		isEnabled = KontentumClient.config.kontentum!=null && KontentumClient.config.kontentum.hosted!=null;
+		isEnabled = Settings.config.kontentum!=null && Settings.config.kontentum.hosted!=null;
 		if (isEnabled)
 			i = new HostedFileSync();
 
@@ -43,10 +43,10 @@ class HostedFileSync
 
     public function new()
 	{
-		localPath = KontentumClient.config.kontentum.hosted.localpath!=null ? KontentumClient.config.kontentum.hosted.localpath : "";
+		localPath = Settings.config.kontentum.hosted.localpath!=null ? Settings.config.kontentum.hosted.localpath : "";
 
-        hostedBaseURL = KontentumClient.config.kontentum.ip+'/hosted/'+KontentumClient.config.kontentum.hosted.folder;
-        syncURL = KontentumClient.config.kontentum.ip+'/'+KontentumClient.config.kontentum.hosted.api+'/'+KontentumClient.config.kontentum.hosted.folder;
+        hostedBaseURL = Settings.config.kontentum.ip+'/hosted/'+Settings.config.kontentum.hosted.folder;
+        syncURL = Settings.config.kontentum.ip+'/'+Settings.config.kontentum.hosted.api+'/'+Settings.config.kontentum.hosted.folder;
 
 		fileListRequest = new HttpRequest( { url:syncURL, callback:onHttpResponse, callbackError:onHttpError });
 		fileListRequest.timeout = 60*3;		
@@ -57,7 +57,7 @@ class HostedFileSync
 
 	function onHttpError(response:HttpResponse) 
 	{
-		if (KontentumClient.debug)
+		if (Settings.debug)
 		{
 			Sys.println("HTTP error : filesync rest problem: "+response.toString());
 			Sys.println("Will retry...");
@@ -82,7 +82,7 @@ class HostedFileSync
 					var jsn:Dynamic = Json.parse(response.content);
 					if (jsn==null)
 					{
-						if (KontentumClient.debug)
+						if (Settings.debug)
 							Sys.println("Error: HTTP filesync JSON data corrupt");
 					}
 					else 
@@ -90,7 +90,7 @@ class HostedFileSync
 						fileList = jsn.files;
 						if (fileList==null)
 						{
-							if (KontentumClient.debug)
+							if (Settings.debug)
 								Sys.println("Error: HTTP filesync JSON data corrupt");
 						}
 						else
@@ -108,7 +108,7 @@ class HostedFileSync
 				}
 				catch(e:Exception)
 				{
-					if (KontentumClient.debug)
+					if (Settings.debug)
 						Sys.println("Error: HTTP filesync JSON error: "+e.message);
 				}
 			}

@@ -1,6 +1,5 @@
 package utils;
 
-import client.ServerCommunicator;
 import cpp.Char;
 import cpp.ConstCharStar;
 import cpp.ConstPointer;
@@ -239,42 +238,42 @@ class WindowsUtils
 	// Utils
 	//-----------------------------------------------------------------------------------
 	
-	static public function setPersistentProcess(exeName:String)
-	{
-		if (exeName==null || exeName=="")
-			return;
+	// static public function setPersistentProcess(exeName:String)
+	// {
+	// 	if (exeName==null || exeName=="")
+	// 		return;
 
-		if (subProcess != null)
-			subProcess.terminate();
+	// 	if (subProcess != null)
+	// 		subProcess.terminate();
 			
-		subProcess = new SubProcess(exeName);
-		subProcess.launchDelay = 0;
-		// subProcess.monitor = KontentumClient.config.appMonitor;
-		subProcess.restartDelay = KontentumClient.config.kontentum.restartdelay;
-		subProcess.subprocessDidCrash = subprocessDidCrash;
-		subProcess.subprocessDidExit = subprocessDidExit;
-		var success = subProcess.run();
+	// 	subProcess = new SubProcess(exeName);
+	// 	subProcess.launchDelay = 0;
+	// 	// subProcess.monitor = KontentumClient.config.appMonitor;
+	// 	subProcess.restartDelay = KontentumClient.config.kontentum.restartdelay;
+	// 	subProcess.subprocessDidCrash = subprocessDidCrash;
+	// 	subProcess.subprocessDidExit = subprocessDidExit;
+	// 	var success = subProcess.run();
 		
-		if (!success)
-			if (KontentumClient.debug)
-				trace("process failed to start....");
-	}	
+	// 	if (!success)
+	// 		if (KontentumClient.debug)
+	// 			trace("process failed to start....");
+	// }	
 	
 	/////////////////////////////////////////////////////////////////////////////////////
 	
-	static function subprocessDidCrash() 
-	{
-		if (KontentumClient.debug)
-			trace("Subprocess crashes. Restarting.");
-		// Network.i.submitAction("APP_CRASH");
-	}
+	// static function subprocessDidCrash() 
+	// {
+	// 	if (KontentumClient.debug)
+	// 		trace("Subprocess crashes. Restarting.");
+	// 	// Network.i.submitAction("APP_CRASH");
+	// }
 	
-	static function subprocessDidExit() 
-	{
-		if (KontentumClient.debug)
-			trace("Subprocess exited. Restarting.");
-		//NetworkHandler.i.submitAction("APP_EXIT");
-	}	
+	// static function subprocessDidExit() 
+	// {
+	// 	if (KontentumClient.debug)
+	// 		trace("Subprocess exited. Restarting.");
+	// 	//NetworkHandler.i.submitAction("APP_EXIT");
+	// }	
 	
 	/////////////////////////////////////////////////////////////////////////////////////
 	
