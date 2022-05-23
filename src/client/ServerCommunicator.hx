@@ -388,7 +388,6 @@ class ServerCommunicator
 
 	function launchOffline()
 	{
-		trace(FileSystem.exists(KontentumClient.offlineLaunchFile),KontentumClient.offlineLaunchFile);
 		if (FileSystem.exists(KontentumClient.offlineLaunchFile))
 		{
 			try 

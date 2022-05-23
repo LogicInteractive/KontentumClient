@@ -433,18 +433,23 @@ class WindowsUtils
 			hr = CoCreateInstance(__uuidof(MMDeviceEnumerator), NULL, CLSCTX_INPROC_SERVER, __uuidof(IMMDeviceEnumerator), (LPVOID *)&deviceEnumerator);
 			IMMDevice *defaultDevice = NULL;
 
-			hr = deviceEnumerator->GetDefaultAudioEndpoint(eRender, eConsole, &defaultDevice);
-			deviceEnumerator->Release();
-			deviceEnumerator = NULL;
+			if (deviceEnumerator)
+			{
+				hr = deviceEnumerator->GetDefaultAudioEndpoint(eRender, eConsole, &defaultDevice);
+				deviceEnumerator->Release();
+				deviceEnumerator = NULL;
 
-			IAudioEndpointVolume *endpointVolume = NULL;
-			hr = defaultDevice->Activate(__uuidof(IAudioEndpointVolume), CLSCTX_INPROC_SERVER, NULL, (LPVOID *)&endpointVolume);
-			defaultDevice->Release();
-			defaultDevice = NULL;
+				if (defaultDevice)
+				{
+					IAudioEndpointVolume *endpointVolume = NULL;
+					hr = defaultDevice->Activate(__uuidof(IAudioEndpointVolume), CLSCTX_INPROC_SERVER, NULL, (LPVOID *)&endpointVolume);
+					defaultDevice->Release();
+					defaultDevice = NULL;
 
-			hr = endpointVolume->SetMasterVolumeLevelScalar((float)newVolume, NULL);
-			endpointVolume->Release();
-
+					hr = endpointVolume->SetMasterVolumeLevelScalar((float)newVolume, NULL);
+					endpointVolume->Release();
+				}
+			}
 			CoUninitialize();
 		');
 		#elseif linux
@@ -470,22 +475,28 @@ class WindowsUtils
 			hr = CoCreateInstance(__uuidof(MMDeviceEnumerator), NULL, CLSCTX_INPROC_SERVER, __uuidof(IMMDeviceEnumerator), (LPVOID *)&deviceEnumerator);
 			IMMDevice *defaultDevice = NULL;
 
-			hr = deviceEnumerator->GetDefaultAudioEndpoint(eRender, eConsole, &defaultDevice);
-			deviceEnumerator->Release();
-			deviceEnumerator = NULL;
+			if (deviceEnumerator)
+			{
+				hr = deviceEnumerator->GetDefaultAudioEndpoint(eRender, eConsole, &defaultDevice);
+				deviceEnumerator->Release();
+				deviceEnumerator = NULL;
 
-			IAudioEndpointVolume *endpointVolume = NULL;
-			hr = defaultDevice->Activate(__uuidof(IAudioEndpointVolume), CLSCTX_INPROC_SERVER, NULL, (LPVOID *)&endpointVolume);
-			defaultDevice->Release();
-			defaultDevice = NULL;
+				if (defaultDevice)
+				{
+					IAudioEndpointVolume *endpointVolume = NULL;
+					hr = defaultDevice->Activate(__uuidof(IAudioEndpointVolume), CLSCTX_INPROC_SERVER, NULL, (LPVOID *)&endpointVolume);
+					defaultDevice->Release();
+					defaultDevice = NULL;
 
-			float currentVolume = 0;
-			endpointVolume->GetMasterVolumeLevel(&currentVolume);
-			hr = endpointVolume->GetMasterVolumeLevelScalar(&currentVolume);
-			endpointVolume->Release();
+					float currentVolume = 0;
+					endpointVolume->GetMasterVolumeLevel(&currentVolume);
+					hr = endpointVolume->GetMasterVolumeLevelScalar(&currentVolume);
+					endpointVolume->Release();
 
+					rVolume = (Float)currentVolume;
+				}
+			}
 			CoUninitialize();
-			rVolume = (Float)currentVolume;
 		');
 		#elseif linux
 		//Requires alsa-utils to be installed : "sudo apt-get install alsa-utils"
