@@ -61,6 +61,7 @@ class ServerCommunicator
 
 	var http						: Http;
 	var restStr						: String;
+	var initialConnectionOK			: Bool				= false;
 	var waitForResponse				: Bool;
 	var timerDirty					: Bool;
 	var pingTimer					: Timer;
@@ -71,6 +72,7 @@ class ServerCommunicator
 
 	var forceRebulidCache			: Bool				= false;
 	var downloadAllFiles			: Bool				= false;
+	var offlineMode					: Bool				= false;
 	
 	var c							: ConfigXML;
 
@@ -93,6 +95,8 @@ class ServerCommunicator
 	
 	public function startNet()
 	{
+		Timer.delay(checkInitialConnection,Std.int(KontentumClient.config.kontentum.fallbackdelay*1000));
+
  		var adapter = WindowsUtils.getNetworkAdapterInfo( WindowsUtils.ADAPTER_TYPE_ANY );
 		if (adapter.ip == "0.0.0.0")
 		{
@@ -112,9 +116,8 @@ class ServerCommunicator
 			restURLFirst = restURLBase + "/" +  StringTools.urlEncode(adapter.ip) + "/" + StringTools.urlEncode(adapter.mac) + "/" + StringTools.urlEncode(adapter.hostname) + "/" + StringTools.urlEncode(KontentumClient.buildDate.toString()) + "/" + vol;
 			httpRequestFirst = new HttpRequest( { url:restURLFirst, callback:onHttpResponseFirst, callbackError:onHttpFirstError });
 			httpRequestFirst.timeout = 60*3;
-			trace("REST: "+ restURL);
 			createTimer();
-			
+
 			restStr = null;
 			try
 			{
@@ -202,6 +205,8 @@ class ServerCommunicator
 		{
 			if (response.content != null)
 			{
+				initialConnectionOK = true;
+				
 				if (KontentumClient.downloadFiles)
 					KontentumClient.i.startFileDownload();
 
@@ -353,14 +358,23 @@ class ServerCommunicator
 			trace("Will retry connection...");
 		}
 
+		Sys.sleep(10);
+
 		httpRequestFirst = httpRequestFirst.clone();
 		httpRequestFirst.send();
 
-		trace(launch);
+		// if (launch == null)
+			// launchOffline();
 			
-		if (launch == null)
-			launchOffline();
-			
+	}
+
+	function checkInitialConnection()
+	{
+		if (!initialConnectionOK)
+		{
+			if (launch == null)
+				launchOffline();
+		}
 	}
 
 	function onHttpError(response:HttpResponse) 
@@ -374,6 +388,7 @@ class ServerCommunicator
 
 	function launchOffline()
 	{
+		trace(FileSystem.exists(KontentumClient.offlineLaunchFile),KontentumClient.offlineLaunchFile);
 		if (FileSystem.exists(KontentumClient.offlineLaunchFile))
 		{
 			try 
@@ -439,7 +454,6 @@ class ServerCommunicator
 			KontentumClient.killExplorer = ci.killexplorer;
 	}
 
-
 	/////////////////////////////////////////////////////////////////////////////////////
 
 	function adjustParams(pingData:JSONPingData)
@@ -461,7 +475,6 @@ class ServerCommunicator
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////
-
 }
 
 typedef JSONPingData =

@@ -411,6 +411,8 @@ typedef KontentumConfig =
 	var download			: Null<Bool>;
 	var localFiles			: String;
 	var hosted				: HostedFileSyncConfig;
+	var fallback			: String;
+	var fallbackdelay		: Float;
 }
 
 typedef HostedFileSyncConfig =
