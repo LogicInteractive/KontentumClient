@@ -73,7 +73,8 @@ class ServerCommunicator
 	var forceRebulidCache			: Bool				= false;
 	var downloadAllFiles			: Bool				= false;
 	var offlineMode					: Bool				= false;
-	
+	var fallbackdelay				: Float				= 30.0;
+
 	var c							: ConfigXML;
 
 	/////////////////////////////////////////////////////////////////////////////////////
@@ -95,7 +96,7 @@ class ServerCommunicator
 	
 	public function startNet()
 	{
-		Timer.delay(checkInitialConnection,Std.int(KontentumClient.config.kontentum.fallbackdelay*1000));
+		Timer.delay(checkInitialConnection,Std.int(fallbackdelay*1000));
 
  		var adapter = WindowsUtils.getNetworkAdapterInfo( WindowsUtils.ADAPTER_TYPE_ANY );
 		if (adapter.ip == "0.0.0.0")

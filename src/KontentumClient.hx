@@ -6,11 +6,13 @@ import fox.compile.CompileTime;
 import fox.kontentum.Kontentum;
 import fox.loader.Loader;
 import fox.native.windows.Chrome;
+import fox.utils.Convert;
 import fox.utils.DateUtils;
 import fox.utils.ObjUtils;
 import fox.utils.Tick;
 import haxe.Resource;
 import haxe.io.Bytes;
+import haxe.io.Path;
 import haxe.macro.Expr.Catch;
 import sys.FileSystem;
 import sys.io.File;
@@ -132,6 +134,9 @@ class KontentumClient
 		if (config.kontentum.exhibitToken==null)
 			config.kontentum.exhibitToken = "_";
 
+		if (config.kontentum.downloadAllFiles!=null)
+			Kontentum.forceDownloadAllFiles = Convert.toBool(config.kontentum.downloadAllFiles);
+
 		#if windows
 		if (!config.debug && !config.kontentum.download)
 			WindowsUtils.freeConsole();
@@ -238,6 +243,17 @@ class KontentumClient
 			return;
 		try 
 		{
+			if (!FileSystem.exists("c:/temp"))
+			{
+				try 
+				{
+					FileSystem.createDirectory("c:/temp");
+				}
+				catch(e:haxe.Exception)
+				{
+					
+				}
+			}
 			File.saveContent(offlineLaunchFile,file);
 		}
 		catch(e:Dynamic)
@@ -265,6 +281,7 @@ class KontentumClient
 			localFileCache = config.kontentum.localFiles;
 
 		Kontentum.connect(config.kontentum.exhibitToken,config.kontentum.ip,localFileCache,true,false,false,true);
+		Kontentum.fileURL = Kontentum.rest_ip + "/" + Kontentum.remoteFilePath + "/";
 	}
 
 	function onKontentumDownloadProgress()
@@ -409,6 +426,7 @@ typedef KontentumConfig =
 	var delay				: Float;
 	var restartdelay		: Float;
 	var download			: Null<Bool>;
+	var downloadAllFiles	: Null<Bool>;
 	var localFiles			: String;
 	var hosted				: HostedFileSyncConfig;
 	var fallback			: String;
