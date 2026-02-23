@@ -2,16 +2,24 @@
 
 -cp src
 -main KontentumClient
---cpp bin/build
+
 -D HXCPP_STACK_TRACE
 -D HXCPP_STACK_LINE
 -D HXCPP_CHECK_POINTER
+
+--cpp bin/build
 -D HXCPP_M64
+
+#-D HXCPP_M32
+#--cpp bin/build32
+
+
 # -D HXCPP_GC_DYNAMIC_SIZE
 # -D HXCPP_GC_BIG_BLOCKS
 # -D HXCPP_CPP11
 --times
 --resource bin/ClientUpdater.exe@updater
+--resource assets/kontentum.ico@trayico
 
 ###############################################
 

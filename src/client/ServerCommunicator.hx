@@ -22,6 +22,7 @@ import haxe.macro.Expr.Error;
 import sys.FileSystem;
 import sys.io.File;
 import sys.io.FileOutput;
+import utils.Log;
 import utils.WindowsUtils;
 
 /**
@@ -116,7 +117,8 @@ class ServerCommunicator
 
 			restURLFirst = restURLBase + "/" +  StringTools.urlEncode(adapter.ip) + "/" + StringTools.urlEncode(adapter.mac) + "/" + StringTools.urlEncode(adapter.hostname) + "/" + StringTools.urlEncode(KontentumClient.buildDate.toString()) + "/" + vol;
 			httpRequestFirst = new HttpRequest( { url:restURLFirst, callback:onHttpResponseFirst, callbackError:onHttpFirstError });
-			httpRequestFirst.timeout = 60*3;
+			// Use 60 second timeout for first connection (reduced from 3 minutes to avoid long hangs)
+			httpRequestFirst.timeout = 60;
 			createTimer();
 
 			restStr = null;
@@ -143,23 +145,31 @@ class ServerCommunicator
 	}
 
 	@:keep
-	function pingCallback() 
+	function pingCallback()
 	{
-		if (timerDirty)
+		// Wrap in try/catch to prevent unhandled exceptions from killing the timer
+		try
 		{
-			if (pingTimer != null)
-				pingTimer.stop();
+			if (timerDirty)
+			{
+				if (pingTimer != null)
+					pingTimer.stop();
 
-			if (KontentumClient.debug)
-				trace("Changing ping time to : " + c.kontentum.interval);
-				
-			pingTimer = new Timer(Std.int(c.kontentum.interval*1000));
-			pingTimer.run = pingCallback;	
-			timerDirty = false;
+				if (KontentumClient.debug)
+					trace("Changing ping time to : " + c.kontentum.interval);
+
+				pingTimer = new Timer(Std.int(c.kontentum.interval*1000));
+				pingTimer.run = pingCallback;
+				timerDirty = false;
+			}
+
+			if (!waitForResponse && KontentumClient.ready)
+				makeRequest();
 		}
-		
-		if (!waitForResponse && KontentumClient.ready)
-			makeRequest();
+		catch (e:Dynamic)
+		{
+			utils.Log.logException("[PingTimer] Exception", e);
+		}
 	}
 
 	// @:keep
@@ -202,37 +212,53 @@ class ServerCommunicator
 	
 	function onHttpResponseFirst(response:HttpResponse)
 	{
-		if (response.isOK)
+		try
 		{
-			if (response.content != null)
+			if (response.isOK)
 			{
-				initialConnectionOK = true;
-				
-				if (KontentumClient.downloadFiles)
-					KontentumClient.i.startFileDownload();
+				if (response.content != null)
+				{
+					initialConnectionOK = true;
 
-				requestComplete();
+					if (KontentumClient.downloadFiles)
+						KontentumClient.i.startFileDownload();
 
+					requestComplete();
+
+				}
+				// else
+					// onPingCorruptData(response);
 			}
-			// else
-				// onPingCorruptData(response);
+			else
+				onHttpFirstError(response);
+				// onPingError(response);
 		}
-		else
-			onHttpFirstError(response);
-			// onPingError(response);
+		catch (e:Dynamic)
+		{
+			utils.Log.logException("[HttpFirst] Exception in response handler", e);
+			requestComplete();
+		}
 	}
 
 	function onHttpResponse(response:HttpResponse)
 	{
-		if (response.isOK)
+		try
 		{
-			if (response.content != null)
-				onPingData(response);
+			if (response.isOK)
+			{
+				if (response.content != null)
+					onPingData(response);
+				else
+					onPingCorruptData(response);
+			}
 			else
-				onPingCorruptData(response);
+				onPingError(response);
 		}
-		else
-			onPingError(response);
+		catch (e:Dynamic)
+		{
+			utils.Log.logException("[HttpPing] Exception in response handler", e);
+			requestComplete();
+		}
 	}  
 			
 	function onPingData(response:HttpResponse) 
@@ -283,10 +309,17 @@ class ServerCommunicator
 
 					if (KontentumClient.config.overridelaunch!=null && KontentumClient.config.overridelaunch!="")
 						launch = KontentumClient.config.overridelaunch;
-					else 
+					else
 						KontentumClient.cacheLaunchFile(launch);
 
-					if (isWeb(launch))
+					// Launch the app (web URL -> Chrome, otherwise -> process)
+					// Skip if this is a crash recovery restart (app may still be running)
+					if (KontentumClient.skipAppLaunch)
+					{
+						// Always log this - important for debugging crash recovery
+						trace("SKIP_APP_LAUNCH: Skipping app launch (crash recovery mode, skipAppLaunch=" + KontentumClient.skipAppLaunch + ")");
+					}
+					else if (isWeb(launch))
 						KontentumClient.launchChrome(launch);
 					else
 						WindowsUtils.setPersistentProcess(launch);
@@ -325,7 +358,7 @@ class ServerCommunicator
 		}
 	} 
 
-	function onPingError(response:HttpResponse) 
+	function onPingError(response:HttpResponse)
 	{
 		if (response==null)
 		{
@@ -337,54 +370,78 @@ class ServerCommunicator
 			trace("Response - error: "+ response.status + " " + response.error);
 			trace(response.contentRaw);
 		}
-		
-		Sys.sleep(10);
-		requestComplete();
+
+		// Use non-blocking delay instead of Sys.sleep() to avoid blocking watchdog pings
+		Timer.delay(requestComplete, 10000);
 	}
-	
-	function onPingCorruptData(response:HttpResponse) 
+
+	function onPingCorruptData(response:HttpResponse)
 	{
 		if (KontentumClient.debug)
 			trace("Response - not valid response data: "+ response.status + " " + response.content);
-		// no valid data...
-		Sys.sleep(10);
-		requestComplete();
+		// no valid data - use non-blocking delay instead of Sys.sleep()
+		Timer.delay(requestComplete, 10000);
 	}
 
-	function onHttpFirstError(response:HttpResponse) 
+	function onHttpFirstError(response:HttpResponse)
 	{
-		if (KontentumClient.debug)
+		try
 		{
-			trace("HTTP error: "+response.toString());
-			trace("Will retry connection...");
+			if (KontentumClient.debug)
+			{
+				trace("HTTP error: "+response.toString());
+				trace("Will retry connection...");
+			}
+
+			// Use non-blocking delay instead of Sys.sleep() to avoid blocking watchdog pings
+			Timer.delay(function() {
+				try
+				{
+					httpRequestFirst = httpRequestFirst.clone();
+					httpRequestFirst.send();
+				}
+				catch (e:Dynamic)
+				{
+					utils.Log.logException("[HttpFirstRetry] Exception retrying", e);
+				}
+			}, 10000);
 		}
-
-		Sys.sleep(10);
-
-		httpRequestFirst = httpRequestFirst.clone();
-		httpRequestFirst.send();
-
-		// if (launch == null)
-			// launchOffline();
-			
+		catch (e:Dynamic)
+		{
+			utils.Log.logException("[HttpFirstError] Exception in error handler", e);
+		}
 	}
 
 	function checkInitialConnection()
 	{
-		if (!initialConnectionOK)
+		try
 		{
-			if (launch == null)
-				launchOffline();
+			if (!initialConnectionOK)
+			{
+				if (launch == null)
+					launchOffline();
+			}
+		}
+		catch (e:Dynamic)
+		{
+			utils.Log.logException("[InitConnection] Exception in connection check", e);
 		}
 	}
 
-	function onHttpError(response:HttpResponse) 
+	function onHttpError(response:HttpResponse)
 	{
-		if (KontentumClient.debug)
-			trace("HTTP error: "+response.toString());
+		try
+		{
+			if (KontentumClient.debug)
+				trace("HTTP error: "+response.toString());
 
-		if (launch == null)
-			launchOffline();
+			if (launch == null)
+				launchOffline();
+		}
+		catch (e:Dynamic)
+		{
+			utils.Log.logException("[HttpError] Exception in error handler", e);
+		}
 	}
 
 	function launchOffline()
@@ -423,10 +480,79 @@ class ServerCommunicator
 		submitActionHttpReq.url = submitURL;
 		submitActionHttpReq.timeout = 20;
 		submitActionHttpReq.send();
-		
+
 		if (KontentumClient.debug)
 			trace("Submit action: " + submitURL);
  	}
+
+	public function notifyEvent(eventName:String)
+	{
+		// Send notification using same URL format as watchdog
+		// Format: https://kontentum.link/rest/clientNotify/{exhibitToken}/{appID}/EventName
+		if (KontentumClient.config.kontentum == null || KontentumClient.config.kontentum.exhibitToken == null)
+			return;
+
+		var idToUse = KontentumClient.appID > 0 ? KontentumClient.appID :
+			(KontentumClient.config.kontentum.clientID > 0 ? KontentumClient.config.kontentum.clientID : 0);
+
+		var notifyURL = KontentumClient.config.kontentum.ip + "/rest/clientNotify/" +
+			KontentumClient.config.kontentum.exhibitToken + "/" +
+			idToUse + "/" + eventName;
+
+		var req = new HttpRequest({url: notifyURL, timeout: 5});
+		req.send();
+
+		if (KontentumClient.debug)
+			trace("Event notification: " + notifyURL);
+	}
+
+	/**
+	 * Submit an event/error message to the server (static - can be called without instance)
+	 * Format: {ip}/rest/submitEvent/{token}/{clientid}/{message_url_encoded}
+	 */
+	public static function submitEvent(message:String)
+	{
+		var c = KontentumClient.config;
+		if (c == null || c.kontentum == null)
+			return;
+
+		if (c.kontentum.exhibitToken == null || c.kontentum.clientID == 0 || c.kontentum.ip == null)
+			return;
+
+		var eventURL = c.kontentum.ip + "/rest/submitEvent/" +
+			c.kontentum.exhibitToken + "/" + c.kontentum.clientID + "/" + StringTools.urlEncode(message);
+
+		try
+		{
+			var req = new HttpRequest({url: eventURL, timeout: 10});
+			req.send();
+
+			if (KontentumClient.debug)
+				trace("Submit event: " + eventURL);
+		}
+		catch (e:Dynamic)
+		{
+			// Silently fail - we're likely in a crash scenario
+		}
+	}
+
+	/**
+	 * Get the base URL for submitEvent (used by watchdog for crash reporting)
+	 * Returns: {ip}/rest/submitEvent/{token}/{clientid}/
+	 * Watchdog will append the URL-encoded message
+	 */
+	public static function getSubmitEventBaseURL():String
+	{
+		var c = KontentumClient.config;
+		if (c == null || c.kontentum == null)
+			return null;
+
+		if (c.kontentum.exhibitToken == null || c.kontentum.clientID == 0 || c.kontentum.ip == null)
+			return null;
+
+		return c.kontentum.ip + "/rest/submitEvent/" +
+			c.kontentum.exhibitToken + "/" + c.kontentum.clientID + "/";
+	}
 	
 	function onSubmitActionHttpResponse(response:HttpResponse)
 	{
@@ -452,6 +578,27 @@ class ServerCommunicator
 
 		if (ci.killexplorer!=null)
 			KontentumClient.killExplorer = ci.killexplorer;
+
+		// Store app_id and update watchdog notification URL if we have all the info
+		// Note: app_id is Int (not Null<Int>), so we only check if > 0
+		if (ci.app_id > 0)
+		{
+			KontentumClient.appID = ci.app_id;
+
+			// Update watchdog notification URL now that we have app_id
+			// Format: https://kontentum.link/rest/clientNotify/{exhibitToken}/{appID}/WatchdogCrashDetected
+			if (KontentumClient.enableWatchdog && KontentumClient.config != null &&
+				KontentumClient.config.kontentum != null && KontentumClient.config.kontentum.exhibitToken != null)
+			{
+				var notifyURL = KontentumClient.config.kontentum.ip + "/rest/clientNotify/" +
+					KontentumClient.config.kontentum.exhibitToken + "/" +
+					ci.app_id + "/WatchdogCrashDetected";
+				utils.WatchDog.setNotifyURL(notifyURL);
+
+				if (KontentumClient.debug)
+					trace("Watchdog notification URL updated: " + notifyURL);
+			}
+		}
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////

@@ -44,7 +44,45 @@ typedef NetworkAdapterInfo =
 #include <fstream>
 #include <string.h>
 #include <windows.h>
+#include <io.h>
+#include <fcntl.h>
 #pragma comment(lib, "winmm")
+
+// Allocate console AND redirect stdout/stderr to it
+// This is needed when process was started with DETACHED_PROCESS flag
+BOOL KC_AllocConsoleWithRedirect()
+{
+	if (!AllocConsole())
+		return FALSE;
+
+	// Redirect stdout to console
+	FILE* fpOut = NULL;
+	if (freopen_s(&fpOut, "CONOUT$", "w", stdout) == 0 && fpOut)
+	{
+		setvbuf(stdout, NULL, _IONBF, 0);
+	}
+
+	// Redirect stderr to console
+	FILE* fpErr = NULL;
+	if (freopen_s(&fpErr, "CONOUT$", "w", stderr) == 0 && fpErr)
+	{
+		setvbuf(stderr, NULL, _IONBF, 0);
+	}
+
+	// Redirect stdin to console
+	FILE* fpIn = NULL;
+	if (freopen_s(&fpIn, "CONIN$", "r", stdin) == 0 && fpIn)
+	{
+		setvbuf(stdin, NULL, _IONBF, 0);
+	}
+
+	// Also fix C++ iostream
+	std::cout.clear();
+	std::cerr.clear();
+	std::cin.clear();
+
+	return TRUE;
+}
 
 #pragma comment(lib, "PowrProf.lib")
 #include <powrprof.h>
@@ -246,34 +284,131 @@ class WindowsUtils
 
 		if (subProcess != null)
 			subProcess.terminate();
-			
+
 		subProcess = new SubProcess(exeName);
 		subProcess.launchDelay = 0;
-		// subProcess.monitor = KontentumClient.config.appMonitor;
-		subProcess.restartDelay = KontentumClient.config.kontentum.restartdelay;
-		subProcess.subprocessDidCrash = subprocessDidCrash;
-		subProcess.subprocessDidExit = subprocessDidExit;
+
+		// Check if launching a batch file or script
+		var isBatchFile = isBatchOrScript(exeName);
+
+		if (isBatchFile)
+		{
+			// Batch files (.bat, .cmd) spawn child processes that we can't track reliably
+			// Also scripts (.vbs, .ps1) have similar behavior
+			// Disable monitoring for these file types
+			if (KontentumClient.debug)
+				trace('Detected batch/script file. Disabling process monitoring: $exeName');
+
+			subProcess.monitor = false;
+			subProcess.restartIfCrash = false;
+			subProcess.restartIfExit = false;
+		}
+		else
+		{
+			// Disable monitoring by default - too complex and causes issues
+			// Can be enabled via config.kontentum.appMonitor = true if needed
+			subProcess.monitor = false;
+			if (KontentumClient.config.kontentum.appMonitor != null)
+				subProcess.monitor = KontentumClient.config.kontentum.appMonitor;
+
+			// Configure restart behavior (only used if monitoring is enabled)
+			subProcess.restartIfCrash = false;
+			subProcess.restartIfExit = false;
+
+			// Apply config values (restartdelay is Float, so check > 0)
+			if (KontentumClient.config.kontentum.restartdelay > 0)
+				subProcess.restartDelay = KontentumClient.config.kontentum.restartdelay;
+
+			// Set crash rate limit if configured
+			if (KontentumClient.config.kontentum.maxCrashesPerMinute != null)
+				subProcess.maxRestartsPerMinute = KontentumClient.config.kontentum.maxCrashesPerMinute;
+
+			// Set absolute restart limit if configured
+			if (KontentumClient.config.kontentum.maxTotalRestarts != null)
+				subProcess.maxTotalRestarts = KontentumClient.config.kontentum.maxTotalRestarts;
+
+			subProcess.subprocessDidCrash = subprocessDidCrash;
+			subProcess.subprocessDidExit = subprocessDidExit;
+		}
+
 		var success = subProcess.run();
-		
+
 		if (!success)
 			if (KontentumClient.debug)
 				trace("process failed to start....");
+	}
+
+	/**
+	 * Check if file is a batch file or script that spawns child processes
+	 * These should not be monitored as we can't track the actual process
+	 */
+	static function isBatchOrScript(path:String):Bool
+	{
+		if (path == null || path == "")
+			return false;
+
+		var lower = path.toLowerCase();
+
+		// Batch files and command scripts
+		if (lower.indexOf(".bat") != -1)  return true;
+		if (lower.indexOf(".cmd") != -1)  return true;
+
+		// Windows script files
+		if (lower.indexOf(".vbs") != -1)  return true;
+		if (lower.indexOf(".vbe") != -1)  return true;
+		if (lower.indexOf(".js") != -1)   return true;
+		if (lower.indexOf(".jse") != -1)  return true;
+		if (lower.indexOf(".wsf") != -1)  return true;
+		if (lower.indexOf(".wsh") != -1)  return true;
+
+		// PowerShell scripts
+		if (lower.indexOf(".ps1") != -1)  return true;
+
+		return false;
 	}	
 	
 	/////////////////////////////////////////////////////////////////////////////////////
 	
-	static function subprocessDidCrash() 
+	static function subprocessDidCrash()
 	{
 		if (KontentumClient.debug)
-			trace("Subprocess crashes. Restarting.");
-		// Network.i.submitAction("APP_CRASH");
+			trace("Subprocess crashed. Restarting.");
+
+		// Notify server of crash
+		try
+		{
+			if (client.ServerCommunicator.i != null)
+			{
+				client.ServerCommunicator.i.submitAction("APP_CRASH");
+				client.ServerCommunicator.i.notifyEvent("AppCrash");
+			}
+		}
+		catch (e:Dynamic)
+		{
+			if (KontentumClient.debug)
+				trace("Failed to notify server of crash");
+		}
 	}
-	
-	static function subprocessDidExit() 
+
+	static function subprocessDidExit()
 	{
 		if (KontentumClient.debug)
 			trace("Subprocess exited. Restarting.");
-		//NetworkHandler.i.submitAction("APP_EXIT");
+
+		// Notify server of exit
+		try
+		{
+			if (client.ServerCommunicator.i != null)
+			{
+				client.ServerCommunicator.i.submitAction("APP_EXIT");
+				client.ServerCommunicator.i.notifyEvent("AppExit");
+			}
+		}
+		catch (e:Dynamic)
+		{
+			if (KontentumClient.debug)
+				trace("Failed to notify server of exit");
+		}
 	}	
 	
 	/////////////////////////////////////////////////////////////////////////////////////
@@ -550,7 +685,12 @@ class WindowsUtils
 	@:native("SetSuspendState")					extern static public function setSuspendState(bHibernate:Bool=false,bForce:Bool,bWakeupEventsDisabled:Bool=false):Bool;
 	@:native("SetConsoleTitle")					extern static public function setConsoleTitle(title:String):Void;
 	@:native("FreeConsole")						extern static public function freeConsole():Bool;
-	@:native("AllocConsole")					extern static public function allocConsole():Bool;
+
+	/** Allocate console and redirect stdout/stderr to it (needed for DETACHED_PROCESS restarts) */
+	static public function allocConsole():Bool
+	{
+		return untyped __cpp__('KC_AllocConsoleWithRedirect()');
+	}
 	@:native("GetDesktopWindow")				extern static public function getDesktopWindow():HWND;
 	@:native("GetDC")							extern static public function getDC(handle:HWND):HDC;
 	@:native("CreateCompatibleDC")				extern static public function createCompatibleDC(hdc:HDC):HDC;
