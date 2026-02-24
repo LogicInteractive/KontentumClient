@@ -371,16 +371,18 @@ class ServerCommunicator
 			trace(response.contentRaw);
 		}
 
-		// Use non-blocking delay instead of Sys.sleep() to avoid blocking watchdog pings
-		Timer.delay(requestComplete, 10000);
+		// NOTE: This callback runs on AsyncHttp's worker thread (no event loop).
+		// Do NOT use haxe.Timer here - it throws NoEventLoopException.
+		// Just mark request complete; the pingTimer on the main thread handles retry interval.
+		requestComplete();
 	}
 
 	function onPingCorruptData(response:HttpResponse)
 	{
 		if (KontentumClient.debug)
 			trace("Response - not valid response data: "+ response.status + " " + response.content);
-		// no valid data - use non-blocking delay instead of Sys.sleep()
-		Timer.delay(requestComplete, 10000);
+		// NOTE: Runs on AsyncHttp worker thread - no Timer usage allowed.
+		requestComplete();
 	}
 
 	function onHttpFirstError(response:HttpResponse)
@@ -393,18 +395,12 @@ class ServerCommunicator
 				trace("Will retry connection...");
 			}
 
-			// Use non-blocking delay instead of Sys.sleep() to avoid blocking watchdog pings
-			Timer.delay(function() {
-				try
-				{
-					httpRequestFirst = httpRequestFirst.clone();
-					httpRequestFirst.send();
-				}
-				catch (e:Dynamic)
-				{
-					utils.Log.logException("[HttpFirstRetry] Exception retrying", e);
-				}
-			}, 10000);
+			// NOTE: This callback runs on AsyncHttp's worker thread (no event loop).
+			// Sys.sleep() is safe here - it only blocks this worker thread, not the main thread.
+			Sys.sleep(10);
+
+			httpRequestFirst = httpRequestFirst.clone();
+			httpRequestFirst.send();
 		}
 		catch (e:Dynamic)
 		{
