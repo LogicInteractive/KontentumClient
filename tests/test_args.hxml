@@ -1,0 +1,4 @@
+-cp src
+-main TestArgs
+-cpp bin/test_build
+-D windows

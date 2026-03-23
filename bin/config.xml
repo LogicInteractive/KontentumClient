@@ -9,11 +9,17 @@
 		<forceRebuildCache>false</forceRebuildCache>
 		<downloadAllFiles>false</downloadAllFiles>
 		<delay>5</delay>
-		<fallback>c:/projects/Logic/KontentumClient/bin/84l1dr.json</fallback>
+		<fallback>c:/projects/Logic/KontentumClient/bin/s3sxqb.json</fallback>
 		<fallbackdelay>10.0</fallbackdelay>
+		<appMonitor>false</appMonitor>
+		<restartdelay>2.0</restartdelay>
+		<maxCrashesPerMinute>5</maxCrashesPerMinute>
+		<maxTotalRestarts>20</maxTotalRestarts>
 	</kontentum>
 	<killexplorer>false</killexplorer>
 	<debug>true</debug>
+	<watchdog>true</watchdog>
+	<disableStartupInstall>false</disableStartupInstall>
 	<overridelaunch></overridelaunch>
 	<chrome>C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe</chrome>
 </config>

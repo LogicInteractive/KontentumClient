@@ -16,5 +16,6 @@
 		},
 		"haxe.executable": "haxe",
 		"git.ignoreLimitWarning": true,
+		"dotnet.defaultSolution": "disable",
 	}
 }

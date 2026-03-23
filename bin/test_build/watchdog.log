@@ -1,0 +1,7 @@
+[2025-10-05 11:20:30] Watchdog thread started
+[2025-10-05 11:20:54] Watchdog: Heartbeat timeout (err=0x00000000)
+[2025-10-05 11:20:54] The operation completed successfully.
+
+[2025-10-05 11:20:54] Notifying server: https://kontentum.link/rest/clientNotify/s3sxqb/344/WatchdogCrashDetected
+[2025-10-05 11:20:54] Server notification sent successfully
+[2025-10-05 11:20:54] CreateProcessW failed for restart

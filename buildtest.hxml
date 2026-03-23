@@ -1,0 +1,11 @@
+-cp src
+-main TestFreeze
+--cpp bin/test_build
+-D windows
+-cp c:/dev/fox/fox/hx
+-cp c:/dev/fox/thirdparty/common
+-D HXCPP_M64
+-D HXCPP_STACK_TRACE
+-D HXCPP_STACK_LINE
+-D HXCPP_CHECK_POINTER
+--times

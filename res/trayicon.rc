@@ -1,0 +1,2 @@
+#define IDI_TRAYICON 101
+IDI_TRAYICON ICON "assets\\kontentum.ico"

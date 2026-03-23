@@ -1,7 +1,7 @@
 {
   "haxe.configurations": [],
   "editor.codeActionsOnSave": {
-    "source.sortImports": true
+    "source.sortImports": "explicit"
   },
   "haxe.displayServer": {
     "arguments": [

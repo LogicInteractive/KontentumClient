@@ -1,0 +1,32 @@
+[10:07:09] === KontentumClient start 2026-02-23 10:07:09 ===
+[10:07:09] [CrashHandler] Restart command configured: "C:\logic\kontentum\KontentumClient.exe" --forcedrestart
+[10:07:09] [TRACE] KontentumClient.initSettings:672  Watchdog notification URL: https://kontentum.link//rest/clientNotify/5wocyc/932/WatchdogCrashDetected (using clientID)
+[10:07:09] [TRACE] KontentumClient.initSettings:677  Crash/Event submitEvent URL: https://kontentum.link//rest/submitEvent/5wocyc/932/
+[10:07:39] [TRACE] client.ServerCommunicator.startNet:116  Local IP: 192.168.0.126 | Mac-adress: 98:FA:9B:29:BC:D4 | Hostname:ADMINIS-CCLH60J
+[10:07:40] [TRACE] client.ServerCommunicator.makeRequest:191  Send ping request
+[10:07:40] [TRACE] client.ServerCommunicator.onPingData:284  ResponseData : [callback => , ping => 30, sleep => false, success => true, launch => c:/logic/app/Terminal.exe]
+[10:07:40] [TRACE] utils.SubProcess.processLaunch:126  [SubProcess] Launching: c:/logic/app/Terminal.exe
+[10:07:40] [TRACE] utils.SubProcess.processLaunch:132  [SubProcess] createProcess returned PID: 5076
+[10:07:40] [TRACE] utils.SubProcess.processLaunch:141  [SubProcess] Process started successfully, PID: 5076
+[10:07:40] [TRACE] utils.SubProcess.processLaunch:174  [SubProcess] processLaunch completed successfully
+[10:07:41] [TRACE] client.ServerCommunicator.pingCallback:159  Changing ping time to : 30
+[10:07:41] [TRACE] client.ServerCommunicator.makeRequest:191  Send ping request
+[10:07:41] [TRACE] client.ServerCommunicator.onPingData:284  ResponseData : [callback => , ping => 30, sleep => false, success => true, launch => c:/logic/app/Terminal.exe]
+[10:08:11] [TRACE] client.ServerCommunicator.makeRequest:191  Send ping request
+[10:08:11] [TRACE] client.ServerCommunicator.onPingData:284  ResponseData : [callback => reboot, ping => 30, sleep => false, success => true, launch => c:/logic/app/Terminal.exe]
+[10:08:51] === KontentumClient start 2026-02-23 10:08:51 ===
+[10:08:51] [CrashHandler] Restart command configured: "C:\logic\kontentum\KontentumClient.exe" --forcedrestart
+[10:08:51] [TRACE] KontentumClient.initSettings:672  Watchdog notification URL: https://kontentum.link//rest/clientNotify/5wocyc/932/WatchdogCrashDetected (using clientID)
+[10:08:51] [TRACE] KontentumClient.initSettings:677  Crash/Event submitEvent URL: https://kontentum.link//rest/submitEvent/5wocyc/932/
+[10:09:21] [TRACE] client.ServerCommunicator.startNet:116  Local IP: 192.168.0.126 | Mac-adress: 98:FA:9B:29:BC:D4 | Hostname:ADMINIS-CCLH60J
+[10:09:22] [TRACE] client.ServerCommunicator.makeRequest:191  Send ping request
+[10:09:22] [TRACE] client.ServerCommunicator.onPingData:284  ResponseData : [callback => , ping => 30, sleep => false, success => true, launch => c:/logic/app/Terminal.exe]
+[10:09:22] [TRACE] utils.SubProcess.processLaunch:126  [SubProcess] Launching: c:/logic/app/Terminal.exe
+[10:09:22] [TRACE] utils.SubProcess.processLaunch:132  [SubProcess] createProcess returned PID: 3572
+[10:09:22] [TRACE] utils.SubProcess.processLaunch:141  [SubProcess] Process started successfully, PID: 3572
+[10:09:22] [TRACE] utils.SubProcess.processLaunch:174  [SubProcess] processLaunch completed successfully
+[10:09:23] [TRACE] client.ServerCommunicator.pingCallback:159  Changing ping time to : 30
+[10:09:23] [TRACE] client.ServerCommunicator.makeRequest:191  Send ping request
+[10:09:23] [TRACE] client.ServerCommunicator.onPingData:284  ResponseData : [callback => , ping => 30, sleep => false, success => true, launch => c:/logic/app/Terminal.exe]
+[10:10:06] === KontentumClient start 2026-02-23 10:10:06 ===
+[10:10:06] [CrashHandler] Restart command configured: "C:\logic\kontentum\KontentumClient.exe" --forcedrestart

@@ -1,0 +1,253 @@
+[13:37:13] VEH called: code=0xC0000005
+[13:37:13] VEH: Fatal exception detected, handling crash...
+[13:37:13] VEH: Calling KC_HandleCrash...
+[13:37:13] VEH: KC_HandleCrash completed
+[13:37:13] VEH: Calling TerminateProcess...
+[13:37:53] VEH called: code=0xC0000005
+[13:37:53] VEH: Fatal exception detected, handling crash...
+[13:37:53] VEH: Calling KC_HandleCrash...
+[13:37:53] VEH: KC_HandleCrash completed
+[13:37:53] VEH: Calling TerminateProcess...
+[13:38:13] VEH called: code=0xC0000005
+[13:38:13] VEH: Fatal exception detected, handling crash...
+[13:38:13] VEH: Calling KC_HandleCrash...
+[13:38:13] VEH: KC_HandleCrash completed
+[13:38:13] VEH: Calling TerminateProcess...
+[13:41:40] VEH called: code=0xC0000005
+[13:41:40] VEH: Fatal exception detected, handling crash...
+[13:41:40] VEH: Calling KC_HandleCrash...
+[13:41:40] KC_SubmitCrashEvent called
+[13:41:40] KC_SubmitCrashEvent: Base URL = https://kontentum.link/rest/submitEvent/s3sxqb/344/
+[13:41:40] KC_SubmitCrashEvent: Calling URL (truncated): https://kontentum.link/rest/submitEvent/s3sxqb/344/CRASH%5BVEH%5D%3A+ACCESS_VIOLATION+%280xC0000005%29+at+0x00007FF68FA9400D+%7C+Mem%3A+50%25+used%2C+Process%3A+21MB+%7C+Dump%3A+client-crash-20260203-...
+[13:41:40] KC_SubmitCrashEvent: InternetOpen succeeded
+[13:41:40] KC_SubmitCrashEvent: HTTP request succeeded
+[13:41:40] KC_SubmitCrashEvent: Done
+[13:41:40] VEH: KC_HandleCrash completed
+[13:41:40] VEH: Calling TerminateProcess...
+[13:50:23] VEH called: code=0xC0000005
+[13:50:23] VEH: Fatal exception detected, handling crash...
+[13:50:23] VEH: Calling KC_HandleCrash...
+[13:50:23] KC_SubmitCrashEvent called
+[13:50:23] KC_SubmitCrashEvent: Base URL = https://kontentum.link/rest/submitEvent/s3sxqb/344/
+[13:50:23] KC_SubmitCrashEvent: Calling URL (truncated): https://kontentum.link/rest/submitEvent/s3sxqb/344/?message=CRASH%5BVEH%5D%3A+ACCESS_VIOLATION+%280xC0000005%29+at+0x00007FF6B66F400D+%7C+Mem%3A+50%25+used%2C+Process%3A+20MB+%7C+Dump%3A+client-crash-...
+[13:50:23] KC_SubmitCrashEvent: InternetOpen succeeded
+[13:50:23] KC_SubmitCrashEvent: HTTP request succeeded
+[13:50:23] KC_SubmitCrashEvent: Done
+[13:50:23] VEH: KC_HandleCrash completed
+[13:50:23] VEH: Calling TerminateProcess...
+[13:54:26] VEH called: code=0xC0000005
+[13:54:26] VEH: Fatal exception detected, handling crash...
+[13:54:26] VEH: Calling KC_HandleCrash...
+[13:54:26] KC_SubmitCrashEvent called
+[13:54:26] KC_SubmitCrashEvent: Base URL = https://kontentum.link/rest/submitEvent/s3sxqb/344/
+[13:54:26] KC_SubmitCrashEvent: Calling URL (truncated): https://kontentum.link/rest/submitEvent/s3sxqb/344/CRASH%5BVEH%5D%3A+ACCESS_VIOLATION+%280xC0000005%29+at+0x00007FF60419400D+%7C+Mem%3A+50%25+used%2C+Process%3A+19MB+%7C+Dump%3A+client-crash-20260203-...
+[13:54:26] KC_SubmitCrashEvent: InternetOpen succeeded
+[13:54:26] KC_SubmitCrashEvent: HTTP request succeeded
+[13:54:26] KC_SubmitCrashEvent: Done
+[13:54:26] VEH: KC_HandleCrash completed
+[13:54:26] VEH: Calling TerminateProcess...
+[14:01:00] VEH called: code=0xC0000005
+[14:01:00] VEH: Fatal exception detected, handling crash...
+[14:01:00] VEH: Calling KC_HandleCrash...
+[14:01:00] KC_SubmitCrashEvent called
+[14:01:00] KC_SubmitCrashEvent: Base URL = https://kontentum.link/rest/submitEvent/s3sxqb/344/
+[14:01:00] KC_SubmitCrashEvent: Calling URL (truncated): https://kontentum.link/rest/submitEvent/s3sxqb/344/CRASH%5BVEH%5D%3A+ACCESS_VIOLATION+%280xC0000005%29+at+0x00007FF67C16380D+%7C+Mem%3A+51%25+used%2C+Process%3A+21MB+%7C+Dump%3A+client-crash-20260203-...
+[14:01:00] KC_SubmitCrashEvent: InternetOpen succeeded
+[14:01:00] KC_SubmitCrashEvent: HTTP request succeeded
+[14:01:00] KC_SubmitCrashEvent: Done
+[14:01:00] VEH: KC_HandleCrash completed
+[14:01:00] VEH: Calling TerminateProcess...
+[14:03:44] VEH called: code=0xC0000005
+[14:03:44] VEH: Fatal exception detected, handling crash...
+[14:03:44] VEH: Calling KC_HandleCrash...
+[14:03:44] KC_SubmitCrashEvent called
+[14:03:44] KC_SubmitCrashEvent: Base URL = https://kontentum.link/rest/submitEvent/s3sxqb/344/
+[14:03:44] KC_SubmitCrashEvent: Calling URL (truncated): https://kontentum.link/rest/submitEvent/s3sxqb/344/CRASH%5BVEH%5D%3A+ACCESS_VIOLATION+%280xC0000005%29+at+0x00007FF7437C38ED+%7C+Mem%3A+51%25+used%2C+Process%3A+21MB+%7C+Dump%3A+client-crash-20260203-...
+[14:03:44] KC_SubmitCrashEvent: InternetOpen succeeded
+[14:03:44] KC_SubmitCrashEvent: HTTP response (511 bytes): <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible
+[14:03:44] KC_SubmitCrashEvent: HTTP request completed
+[14:03:44] KC_SubmitCrashEvent: Done
+[14:03:44] VEH: KC_HandleCrash completed
+[14:03:44] VEH: Calling TerminateProcess...
+[14:06:57] VEH called: code=0xC0000005
+[14:06:57] VEH: Fatal exception detected, handling crash...
+[14:06:57] VEH: Calling KC_HandleCrash...
+[14:06:58] KC_SubmitCrashEvent called
+[14:06:58] KC_SubmitCrashEvent: Base URL = https://kontentum.link/rest/submitEvent/s3sxqb/344/
+[14:06:58] KC_SubmitCrashEvent: Calling URL (truncated): https://kontentum.link/rest/submitEvent/s3sxqb/344/CRASH%5BVEH%5D%3A%20ACCESS_VIOLATION%20%280xC0000005%29%20at%200x00007FF6D7B4390D%20%7C%20Mem%3A%2051%25%20used%2C%20Process%3A%2019MB%20%7C%20Dump%3...
+[14:06:58] KC_SubmitCrashEvent: InternetOpen succeeded
+[14:06:58] KC_SubmitCrashEvent: HTTP response (511 bytes): <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible
+[14:06:58] KC_SubmitCrashEvent: HTTP request completed
+[14:06:58] KC_SubmitCrashEvent: Done
+[14:06:58] VEH: KC_HandleCrash completed
+[14:06:58] VEH: Calling TerminateProcess...
+[14:30:36] VEH called: code=0xC0000005
+[14:30:36] VEH: Fatal exception detected, handling crash...
+[14:30:36] VEH: Calling KC_HandleCrash...
+[14:30:36] KC_SubmitCrashEvent called
+[14:30:36] KC_SubmitCrashEvent: Base URL = https://kontentum.link/rest/submitEvent/s3sxqb/344/
+[14:30:36] KC_SubmitCrashEvent: Calling URL (truncated): https://kontentum.link/rest/submitEvent/s3sxqb/344/CRASH-VEH-ACCESS_VIOLATION-0xC0000005...
+[14:30:36] KC_SubmitCrashEvent: InternetOpen succeeded
+[14:30:36] KC_SubmitCrashEvent: HTTP response (16 bytes): {"success":true}
+[14:30:36] KC_SubmitCrashEvent: HTTP request completed
+[14:30:36] KC_SubmitCrashEvent: Done
+[14:30:36] VEH: KC_HandleCrash completed
+[14:30:36] VEH: Calling TerminateProcess...
+[14:31:17] VEH called: code=0xC0000005
+[14:31:17] VEH: Fatal exception detected, handling crash...
+[14:31:17] VEH: Calling KC_HandleCrash...
+[14:31:17] KC_SubmitCrashEvent called
+[14:31:17] KC_SubmitCrashEvent: Base URL = https://kontentum.link/rest/submitEvent/s3sxqb/344/
+[14:31:17] KC_SubmitCrashEvent: Calling URL (truncated): https://kontentum.link/rest/submitEvent/s3sxqb/344/CRASH-VEH-ACCESS_VIOLATION-0xC0000005...
+[14:31:17] KC_SubmitCrashEvent: InternetOpen succeeded
+[14:31:17] KC_SubmitCrashEvent: HTTP response (16 bytes): {"success":true}
+[14:31:17] KC_SubmitCrashEvent: HTTP request completed
+[14:31:17] KC_SubmitCrashEvent: Done
+[14:31:17] VEH: KC_HandleCrash completed
+[14:31:17] VEH: Calling TerminateProcess...
+[14:34:00] VEH called: code=0xC0000005
+[14:34:00] VEH: Fatal exception detected, handling crash...
+[14:34:00] VEH: Calling KC_HandleCrash...
+[14:34:00] KC_SubmitCrashEvent called
+[14:34:00] KC_SubmitCrashEvent: Base URL = https://kontentum.link/rest/submitEvent/s3sxqb/344/
+[14:34:00] KC_SubmitCrashEvent: Calling URL (truncated): https://kontentum.link/rest/submitEvent/s3sxqb/344/%5BCRASH%5D%20%3A%20%28VEH%29%20ACCESS_VIOLATION%20%40%200xC0000005...
+[14:34:00] KC_SubmitCrashEvent: InternetOpen succeeded
+[14:34:00] KC_SubmitCrashEvent: HTTP response (16 bytes): {"success":true}
+[14:34:00] KC_SubmitCrashEvent: HTTP request completed
+[14:34:00] KC_SubmitCrashEvent: Done
+[14:34:00] VEH: KC_HandleCrash completed
+[14:34:00] VEH: Calling TerminateProcess...
+[14:44:38] VEH called: code=0xC0000005
+[14:44:38] VEH: Fatal exception detected, handling crash...
+[14:44:38] VEH: Calling KC_HandleCrash...
+[14:44:38] KC_SubmitCrashEvent called
+[14:44:38] KC_SubmitCrashEvent: Base URL = https://kontentum.link/rest/submitEvent/s3sxqb/344/
+[14:44:38] KC_SubmitCrashEvent: Calling URL (truncated): https://kontentum.link/rest/submitEvent/s3sxqb/344/%5BCLIENT_CRASH%5D%20%3A%20%28VEH%29%20ACCESS_VIOLATION%20%40%200xC0000005...
+[14:44:38] KC_SubmitCrashEvent: InternetOpen succeeded
+[14:44:38] KC_SubmitCrashEvent: HTTP response (16 bytes): {"success":true}
+[14:44:38] KC_SubmitCrashEvent: HTTP request completed
+[14:44:38] KC_SubmitCrashEvent: Done
+[14:44:38] VEH: KC_HandleCrash completed
+[14:44:38] VEH: Calling TerminateProcess...
+[14:50:13] VEH called: code=0xC0000005
+[14:50:13] VEH: Fatal exception detected, handling crash...
+[14:50:13] VEH: Calling KC_HandleCrash...
+[14:50:13] KC_SubmitCrashEvent called
+[14:50:13] KC_SubmitCrashEvent: Base URL = https://kontentum.link/rest/submitEvent/s3sxqb/344/
+[14:50:13] KC_SubmitCrashEvent: Calling URL (truncated): https://kontentum.link/rest/submitEvent/s3sxqb/344/%5BCLIENT_CRASH%5D%20%3A%20%28VEH%29%20ACCESS_VIOLATION%20%40%200xC0000005...
+[14:50:13] KC_SubmitCrashEvent: InternetOpen succeeded
+[14:50:13] KC_SubmitCrashEvent: HTTP response (16 bytes): {"success":true}
+[14:50:13] KC_SubmitCrashEvent: HTTP request completed
+[14:50:13] KC_SubmitCrashEvent: Done
+[14:50:13] VEH: KC_HandleCrash completed
+[14:50:13] VEH: Calling TerminateProcess...
+[14:50:53] VEH called: code=0xC0000005
+[14:50:53] VEH: Fatal exception detected, handling crash...
+[14:50:53] VEH: Calling KC_HandleCrash...
+[14:50:53] KC_SubmitCrashEvent called
+[14:50:53] KC_SubmitCrashEvent: Base URL = https://kontentum.link/rest/submitEvent/s3sxqb/344/
+[14:50:53] KC_SubmitCrashEvent: Calling URL (truncated): https://kontentum.link/rest/submitEvent/s3sxqb/344/%5BCLIENT_CRASH%5D%20%3A%20%28VEH%29%20ACCESS_VIOLATION%20%40%200xC0000005...
+[14:50:53] KC_SubmitCrashEvent: InternetOpen succeeded
+[14:50:53] KC_SubmitCrashEvent: HTTP response (16 bytes): {"success":true}
+[14:50:53] KC_SubmitCrashEvent: HTTP request completed
+[14:50:53] KC_SubmitCrashEvent: Done
+[14:50:53] VEH: KC_HandleCrash completed
+[14:50:53] VEH: Calling TerminateProcess...
+[14:52:56] VEH called: code=0xC0000005
+[14:52:56] VEH: Fatal exception detected, handling crash...
+[14:52:56] VEH: Calling KC_HandleCrash...
+[14:52:56] KC_SubmitCrashEvent called
+[14:52:56] KC_SubmitCrashEvent: Base URL = https://kontentum.link/rest/submitEvent/s3sxqb/344/
+[14:52:56] KC_SubmitCrashEvent: Calling URL (truncated): https://kontentum.link/rest/submitEvent/s3sxqb/344/%5BCLIENT_CRASH%5D%20%3A%20%28VEH%29%20ACCESS_VIOLATION%20%40%200xC0000005...
+[14:52:56] KC_SubmitCrashEvent: InternetOpen succeeded
+[14:52:57] KC_SubmitCrashEvent: HTTP response (16 bytes): {"success":true}
+[14:52:57] KC_SubmitCrashEvent: HTTP request completed
+[14:52:57] KC_SubmitCrashEvent: Done
+[14:52:57] VEH: KC_HandleCrash completed
+[14:52:57] VEH: Calling TerminateProcess...
+[15:22:15] VEH called: code=0xE06D7363
+[15:22:15] KC_HandleHaxeException called
+[15:22:15] KC_SubmitCrashEvent called
+[15:22:15] KC_SubmitCrashEvent: Base URL = https://kontentum.link/rest/submitEvent/s3sxqb/344/
+[15:22:15] KC_SubmitCrashEvent: Calling URL (truncated): https://kontentum.link/rest/submitEvent/s3sxqb/344/%5BHAXE_EXCEPTION%5D%20%3A%20%5BTrayTimer%5D%20Unhandled%20exception%20-%20Test%20Haxe%20exception%20triggered%20from%20tray%20menu...
+[15:22:15] KC_SubmitCrashEvent: InternetOpen succeeded
+[15:22:15] KC_SubmitCrashEvent: HTTP response (16 bytes): {"success":true}
+[15:22:15] KC_SubmitCrashEvent: HTTP request completed
+[15:22:15] KC_SubmitCrashEvent: Done
+[15:22:15] Launching restart command...
+[15:22:15] Restart process created
+[15:25:51] VEH called: code=0xE06D7363
+[15:25:51] KC_HandleHaxeException called
+[15:25:51] KC_SubmitCrashEvent called
+[15:25:51] KC_SubmitCrashEvent: Base URL = https://kontentum.link/rest/submitEvent/s3sxqb/344/
+[15:25:51] KC_SubmitCrashEvent: Calling URL (truncated): https://kontentum.link/rest/submitEvent/s3sxqb/344/%5BHAXE_EXCEPTION%5D%20%3A%20%5BTrayTimer%5D%20Unhandled%20exception%20-%20Test%20Haxe%20exception%20triggered%20from%20tray%20menu...
+[15:25:51] KC_SubmitCrashEvent: InternetOpen succeeded
+[15:25:52] KC_SubmitCrashEvent: HTTP response (16 bytes): {"success":true}
+[15:25:52] KC_SubmitCrashEvent: HTTP request completed
+[15:25:52] KC_SubmitCrashEvent: Done
+[15:25:52] Restart command: "C:\projects\Logic\KontentumClient_n\bin\KontentumClient.exe" --forcedrestart
+[15:25:52] Restart process created, PID=53772
+[15:27:10] VEH called: code=0xE06D7363
+[15:27:10] KC_HandleHaxeException called
+[15:27:10] KC_SubmitCrashEvent called
+[15:27:10] KC_SubmitCrashEvent: Base URL = https://kontentum.link/rest/submitEvent/s3sxqb/344/
+[15:27:10] KC_SubmitCrashEvent: Calling URL (truncated): https://kontentum.link/rest/submitEvent/s3sxqb/344/%5BHAXE_EXCEPTION%5D%20%3A%20%5BTrayTimer%5D%20Unhandled%20exception%20-%20Test%20Haxe%20exception%20triggered%20from%20tray%20menu...
+[15:27:10] KC_SubmitCrashEvent: InternetOpen succeeded
+[15:27:10] KC_SubmitCrashEvent: HTTP response (16 bytes): {"success":true}
+[15:27:10] KC_SubmitCrashEvent: HTTP request completed
+[15:27:10] KC_SubmitCrashEvent: Done
+[15:27:10] Restart command: "C:\projects\Logic\KontentumClient_n\bin\KontentumClient.exe" --forcedrestart
+[15:27:10] Restart process created, PID=22500
+[15:40:26] VEH called: code=0xE06D7363
+[15:40:26] KC_HandleHaxeException called
+[15:40:26] KC_SubmitCrashEvent called
+[15:40:26] KC_SubmitCrashEvent: Base URL = https://kontentum.link/rest/submitEvent/s3sxqb/344/
+[15:40:26] KC_SubmitCrashEvent: Calling URL (truncated): https://kontentum.link/rest/submitEvent/s3sxqb/344/%5BHAXE_EXCEPTION%5D%20%3A%20%5BTrayTimer%5D%20Unhandled%20exception%20-%20Test%20Haxe%20exception%20triggered%20from%20tray%20menu...
+[15:40:26] KC_SubmitCrashEvent: InternetOpen succeeded
+[15:40:26] KC_SubmitCrashEvent: HTTP response (16 bytes): {"success":true}
+[15:40:26] KC_SubmitCrashEvent: HTTP request completed
+[15:40:26] KC_SubmitCrashEvent: Done
+[15:40:26] Restart command: "C:\projects\Logic\KontentumClient_n\bin\KontentumClient.exe" --forcedrestart
+[15:40:26] Restart process created, PID=46248
+[15:47:05] VEH called: code=0xE06D7363
+[15:47:05] KC_HandleHaxeException called
+[15:47:05] KC_SubmitCrashEvent called
+[15:47:05] KC_SubmitCrashEvent: Base URL = https://kontentum.link/rest/submitEvent/s3sxqb/344/
+[15:47:05] KC_SubmitCrashEvent: Calling URL (truncated): https://kontentum.link/rest/submitEvent/s3sxqb/344/%5BHAXE_EXCEPTION%5D%20%3A%20%5BTrayTimer%5D%20Unhandled%20exception%20-%20Test%20Haxe%20exception%20triggered%20from%20tray%20menu...
+[15:47:05] KC_SubmitCrashEvent: InternetOpen succeeded
+[15:47:05] KC_SubmitCrashEvent: HTTP response (16 bytes): {"success":true}
+[15:47:05] KC_SubmitCrashEvent: HTTP request completed
+[15:47:05] KC_SubmitCrashEvent: Done
+[15:47:05] Restart command: "C:\projects\Logic\KontentumClient_n\bin\KontentumClient.exe" --forcedrestart
+[15:47:05] Restart process created, PID=50252
+[15:47:23] VEH called: code=0xE06D7363
+[15:47:23] KC_HandleHaxeException called
+[15:47:23] KC_SubmitCrashEvent called
+[15:47:23] KC_SubmitCrashEvent: Base URL = https://kontentum.link/rest/submitEvent/s3sxqb/344/
+[15:47:23] KC_SubmitCrashEvent: Calling URL (truncated): https://kontentum.link/rest/submitEvent/s3sxqb/344/%5BHAXE_EXCEPTION%5D%20%3A%20%5BTrayTimer%5D%20Unhandled%20exception%20-%20Test%20Haxe%20exception%20triggered%20from%20tray%20menu...
+[15:47:23] KC_SubmitCrashEvent: InternetOpen succeeded
+[15:47:23] KC_SubmitCrashEvent: HTTP response (16 bytes): {"success":true}
+[15:47:23] KC_SubmitCrashEvent: HTTP request completed
+[15:47:23] KC_SubmitCrashEvent: Done
+[15:47:23] Restart command: "C:\projects\Logic\KontentumClient_n\bin\KontentumClient.exe" --forcedrestart
+[15:47:23] Restart process created, PID=51296
+[15:47:33] VEH called: code=0xC0000005
+[15:47:33] VEH: Fatal exception detected, handling crash...
+[15:47:33] VEH: Calling KC_HandleCrash...
+[15:47:33] KC_SubmitCrashEvent called
+[15:47:33] KC_SubmitCrashEvent: Base URL = https://kontentum.link/rest/submitEvent/s3sxqb/344/
+[15:47:33] KC_SubmitCrashEvent: Calling URL (truncated): https://kontentum.link/rest/submitEvent/s3sxqb/344/%5BCLIENT_CRASH%5D%20%3A%20%28VEH%29%20ACCESS_VIOLATION%20%40%200xC0000005...
+[15:47:33] KC_SubmitCrashEvent: InternetOpen succeeded
+[15:47:33] KC_SubmitCrashEvent: HTTP response (16 bytes): {"success":true}
+[15:47:33] KC_SubmitCrashEvent: HTTP request completed
+[15:47:33] KC_SubmitCrashEvent: Done
+[15:47:33] VEH: KC_HandleCrash completed
+[15:47:33] VEH: Calling TerminateProcess...

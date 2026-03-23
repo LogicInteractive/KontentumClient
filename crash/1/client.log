@@ -1,0 +1,12 @@
+[09:38:52] === KontentumClient start 2026-02-23 09:38:52 ===
+[09:38:52] [CrashHandler] Restart command configured: "C:\logic\kontentum\n\KontentumClient.exe" --forcedrestart
+[09:38:52] [TRACE] KontentumClient.initSettings:670  Watchdog notification URL: https://kontentum.link//rest/clientNotify/5wocyc/932/WatchdogCrashDetected (using clientID)
+[09:38:52] [TRACE] KontentumClient.initSettings:675  Crash/Event submitEvent URL: https://kontentum.link//rest/submitEvent/5wocyc/932/
+[09:52:56] === KontentumClient start 2026-02-23 09:52:56 ===
+[09:52:56] [CrashHandler] Restart command configured: "C:\logic\kontentum\n\KontentumClient.exe" --forcedrestart
+[09:52:56] [TRACE] KontentumClient.initSettings:670  Watchdog notification URL: https://kontentum.link//rest/clientNotify/5wocyc/932/WatchdogCrashDetected (using clientID)
+[09:52:56] [TRACE] KontentumClient.initSettings:675  Crash/Event submitEvent URL: https://kontentum.link//rest/submitEvent/5wocyc/932/
+[09:53:08] === KontentumClient start 2026-02-23 09:53:08 ===
+[09:53:08] [CrashHandler] Restart command configured: "C:\logic\kontentum\n\KontentumClient.exe" --forcedrestart
+[09:53:08] [TRACE] KontentumClient.initSettings:670  Watchdog notification URL: https://kontentum.link//rest/clientNotify/5wocyc/932/WatchdogCrashDetected (using clientID)
+[09:53:08] [TRACE] KontentumClient.initSettings:675  Crash/Event submitEvent URL: https://kontentum.link//rest/submitEvent/5wocyc/932/

@@ -1,0 +1,13 @@
+-cp src
+-cp c:/dev/fox/fox/hx/
+-cp c:/dev/fox/thirdparty/common/
+
+-main TestChromeCrash
+-cpp bin/test_build
+-cmd cd bin/test_build && copy /Y TestChromeCrash.exe ..\TestChromeCrash.exe
+
+-dce no
+-D HXCPP_STACK_TRACE
+-D HXCPP_CHECK_POINTER
+-D HXCPP_STACK_LINE
+-D HXCPP_M64

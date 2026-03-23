@@ -1,0 +1,19 @@
+<config>
+	<kontentum>
+		<ip>https://kontentum.link</ip>
+		<api>rest/pingClient</api>
+		<clientID>344</clientID>
+		<exhibitToken>s3sxqb</exhibitToken>
+		<download>true</download>
+		<localFiles>c:/Logic/files</localFiles>
+		<forceRebuildCache>false</forceRebuildCache>
+		<downloadAllFiles>false</downloadAllFiles>
+		<delay>5</delay>
+		<fallback>c:/projects/Logic/KontentumClient/bin/84l1dr.json</fallback>
+		<fallbackdelay>10.0</fallbackdelay>
+	</kontentum>
+	<killexplorer>false</killexplorer>
+	<debug>true</debug>
+	<overridelaunch></overridelaunch>
+	<chrome>C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe</chrome>
+</config>

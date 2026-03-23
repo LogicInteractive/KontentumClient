@@ -1,0 +1,18 @@
+[09:53:18] === KontentumClient start 2026-02-23 09:53:18 ===
+[09:53:18] [CrashHandler] Restart command configured: "C:\logic\kontentum\n\KontentumClient.exe" --forcedrestart
+[09:53:18] [TRACE] KontentumClient.initSettings:670  Watchdog notification URL: https://kontentum.link//rest/clientNotify/5wocyc/932/WatchdogCrashDetected (using clientID)
+[09:53:18] [TRACE] KontentumClient.initSettings:675  Crash/Event submitEvent URL: https://kontentum.link//rest/submitEvent/5wocyc/932/
+[09:53:29] === KontentumClient start 2026-02-23 09:53:29 ===
+[09:53:29] [CrashHandler] Restart command configured: "C:\logic\kontentum\n\KontentumClient.exe" --forcedrestart
+[09:53:29] [TRACE] KontentumClient.initSettings:670  Watchdog notification URL: https://kontentum.link//rest/clientNotify/5wocyc/932/WatchdogCrashDetected (using clientID)
+[09:53:29] [TRACE] KontentumClient.initSettings:675  Crash/Event submitEvent URL: https://kontentum.link//rest/submitEvent/5wocyc/932/
+[2026-02-23 09:38:52] Watchdog thread started
+[2026-02-23 09:39:02] Watchdog: Heartbeat timeout (err=0x000000B7)
+[2026-02-23 09:39:02] Cannot create a file when that file already exists.
+
+[2026-02-23 09:39:02] Submitting event: https://kontentum.link//rest/submitEvent/5wocyc/932/Heartbeat%20timeout
+[2026-02-23 09:39:02] Event submitted (16 bytes): {"success":true}
+[2026-02-23 09:39:02] Notifying server: https://kontentum.link//rest/clientNotify/5wocyc/932/WatchdogCrashDetected
+[2026-02-23 09:39:02] Server notification completed
+[2026-02-23 09:39:02] Releasing app mutex before restart
+[2026-02-23 09:39:02] Cre

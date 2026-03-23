@@ -1,0 +1,77 @@
+[13:28:50] === KontentumClient start 2026-03-02 13:28:50 ===
+[13:28:50] [CrashHandler] Restart command configured: "C:\logic\kontentum\KontentumClient.exe" --forcedrestart
+[13:29:08] [TRACE] utils.SubProcess.processLaunch:126  [SubProcess] Launching: c:/logic/app/Terminal.exe
+[13:29:08] [TRACE] utils.SubProcess.processLaunch:132  [SubProcess] createProcess returned PID: 10976
+[13:29:08] [TRACE] utils.SubProcess.processLaunch:141  [SubProcess] Process started successfully, PID: 10976
+[13:29:08] [TRACE] utils.SubProcess.processLaunch:174  [SubProcess] processLaunch completed successfully
+[07:47:06] === KontentumClient start 2026-03-03 07:47:06 ===
+[07:47:06] [CrashHandler] Restart command configured: "C:\logic\kontentum\KontentumClient.exe" --forcedrestart
+[07:47:25] [TRACE] utils.SubProcess.processLaunch:126  [SubProcess] Launching: c:/logic/app/Terminal.exe
+[07:47:25] [TRACE] utils.SubProcess.processLaunch:132  [SubProcess] createProcess returned PID: 5072
+[07:47:25] [TRACE] utils.SubProcess.processLaunch:141  [SubProcess] Process started successfully, PID: 5072
+[07:47:25] [TRACE] utils.SubProcess.processLaunch:174  [SubProcess] processLaunch completed successfully
+[07:45:09] === KontentumClient start 2026-03-04 07:45:09 ===
+[07:45:09] [CrashHandler] Restart command configured: "C:\logic\kontentum\KontentumClient.exe" --forcedrestart
+[07:45:27] [TRACE] utils.SubProcess.processLaunch:126  [SubProcess] Launching: c:/logic/app/Terminal.exe
+[07:45:27] [TRACE] utils.SubProcess.processLaunch:132  [SubProcess] createProcess returned PID: 12060
+[07:45:27] [TRACE] utils.SubProcess.processLaunch:141  [SubProcess] Process started successfully, PID: 12060
+[07:45:27] [TRACE] utils.SubProcess.processLaunch:174  [SubProcess] processLaunch completed successfully
+[08:00:22] === KontentumClient start 2026-03-05 08:00:22 ===
+[08:00:22] [CrashHandler] Restart command configured: "C:\logic\kontentum\KontentumClient.exe" --forcedrestart
+[08:00:40] [TRACE] utils.SubProcess.processLaunch:126  [SubProcess] Launching: c:/logic/app/Terminal.exe
+[08:00:40] [TRACE] utils.SubProcess.processLaunch:132  [SubProcess] createProcess returned PID: 12252
+[08:00:40] [TRACE] utils.SubProcess.processLaunch:141  [SubProcess] Process started successfully, PID: 12252
+[08:00:40] [TRACE] utils.SubProcess.processLaunch:174  [SubProcess] processLaunch completed successfully
+[07:38:31] === KontentumClient start 2026-03-06 07:38:31 ===
+[07:38:31] [CrashHandler] Restart command configured: "C:\logic\kontentum\KontentumClient.exe" --forcedrestart
+[07:38:48] [TRACE] utils.SubProcess.processLaunch:126  [SubProcess] Launching: c:/logic/app/Terminal.exe
+[07:38:48] [TRACE] utils.SubProcess.processLaunch:132  [SubProcess] createProcess returned PID: 7992
+[07:38:48] [TRACE] utils.SubProcess.processLaunch:141  [SubProcess] Process started successfully, PID: 7992
+[07:38:48] [TRACE] utils.SubProcess.processLaunch:174  [SubProcess] processLaunch completed successfully
+[10:21:35] === KontentumClient start 2026-03-07 10:21:35 ===
+[10:21:35] [CrashHandler] Restart command configured: "C:\logic\kontentum\KontentumClient.exe" --forcedrestart
+[10:21:53] [TRACE] utils.SubProcess.processLaunch:126  [SubProcess] Launching: c:/logic/app/Terminal.exe
+[10:21:53] [TRACE] utils.SubProcess.processLaunch:132  [SubProcess] createProcess returned PID: 12280
+[10:21:53] [TRACE] utils.SubProcess.processLaunch:141  [SubProcess] Process started successfully, PID: 12280
+[10:21:53] [TRACE] utils.SubProcess.processLaunch:174  [SubProcess] processLaunch completed successfully
+[10:21:02] === KontentumClient start 2026-03-08 10:21:02 ===
+[10:21:02] [CrashHandler] Restart command configured: "C:\logic\kontentum\KontentumClient.exe" --forcedrestart
+[10:21:20] [TRACE] utils.SubProcess.processLaunch:126  [SubProcess] Launching: c:/logic/app/Terminal.exe
+[10:21:20] [TRACE] utils.SubProcess.processLaunch:132  [SubProcess] createProcess returned PID: 2624
+[10:21:20] [TRACE] utils.SubProcess.processLaunch:141  [SubProcess] Process started successfully, PID: 2624
+[10:21:20] [TRACE] utils.SubProcess.processLaunch:174  [SubProcess] processLaunch completed successfully
+[07:56:03] === KontentumClient start 2026-03-09 07:56:03 ===
+[07:56:03] [CrashHandler] Restart command configured: "C:\logic\kontentum\KontentumClient.exe" --forcedrestart
+[07:56:20] [TRACE] utils.SubProcess.processLaunch:126  [SubProcess] Launching: c:/logic/app/Terminal.exe
+[07:56:20] [TRACE] utils.SubProcess.processLaunch:132  [SubProcess] createProcess returned PID: 7388
+[07:56:20] [TRACE] utils.SubProcess.processLaunch:141  [SubProcess] Process started successfully, PID: 7388
+[07:56:20] [TRACE] utils.SubProcess.processLaunch:174  [SubProcess] processLaunch completed successfully
+[08:01:05] === KontentumClient start 2026-03-10 08:01:05 ===
+[08:01:05] [CrashHandler] Restart command configured: "C:\logic\kontentum\KontentumClient.exe" --forcedrestart
+[08:01:23] [TRACE] utils.SubProcess.processLaunch:126  [SubProcess] Launching: c:/logic/app/Terminal.exe
+[08:01:23] [TRACE] utils.SubProcess.processLaunch:132  [SubProcess] createProcess returned PID: 12144
+[08:01:23] [TRACE] utils.SubProcess.processLaunch:141  [SubProcess] Process started successfully, PID: 12144
+[08:01:23] [TRACE] utils.SubProcess.processLaunch:174  [SubProcess] processLaunch completed successfully
+
+[NATIVE_CRASH] [NATIVE_CRASH] : (VEH) ACCESS_VIOLATION @ 0xC0000005
+[11:25:44] === KontentumClient start 2026-03-10 11:25:44 ===
+[11:25:44] [CrashHandler] Restart command configured: "C:\logic\kontentum\KontentumClient.exe" --forcedrestart
+[11:26:01] [TRACE] client.ServerCommunicator.onPingData:320  SKIP_APP_LAUNCH: Skipping app launch (crash recovery mode, skipAppLaunch=true)
+[07:53:35] === KontentumClient start 2026-03-11 07:53:35 ===
+[07:53:35] [CrashHandler] Restart command configured: "C:\logic\kontentum\KontentumClient.exe" --forcedrestart
+[07:53:53] [TRACE] utils.SubProcess.processLaunch:126  [SubProcess] Launching: c:/logic/app/Terminal.exe
+[07:53:53] [TRACE] utils.SubProcess.processLaunch:132  [SubProcess] createProcess returned PID: 12180
+[07:53:53] [TRACE] utils.SubProcess.processLaunch:141  [SubProcess] Process started successfully, PID: 12180
+[07:53:53] [TRACE] utils.SubProcess.processLaunch:174  [SubProcess] processLaunch completed successfully
+[08:22:42] === KontentumClient start 2026-03-11 08:22:42 ===
+[08:22:42] [CrashHandler] Restart command configured: "C:\logic\kontentum\KontentumClient.exe" --forcedrestart
+[08:22:59] [TRACE] utils.SubProcess.processLaunch:126  [SubProcess] Launching: c:/logic/app/Terminal.exe
+[08:22:59] [TRACE] utils.SubProcess.processLaunch:132  [SubProcess] createProcess returned PID: 9380
+[08:22:59] [TRACE] utils.SubProcess.processLaunch:141  [SubProcess] Process started successfully, PID: 9380
+[08:22:59] [TRACE] utils.SubProcess.processLaunch:174  [SubProcess] processLaunch completed successfully
+[07:58:36] === KontentumClient start 2026-03-12 07:58:36 ===
+[07:58:36] [CrashHandler] Restart command configured: "C:\logic\kontentum\KontentumClient.exe" --forcedrestart
+[07:58:54] [TRACE] utils.SubProcess.processLaunch:126  [SubProcess] Launching: c:/logic/app/Terminal.exe
+[07:58:54] [TRACE] utils.SubProcess.processLaunch:132  [SubProcess] createProcess returned PID: 8352
+[07:58:54] [TRACE] utils.SubProcess.processLaunch:141  [SubProcess] Process started successfully, PID: 8352
+[07:58:54] [TRACE] utils.SubProcess.processLaunch:174  [SubProcess] processLaunch completed successfully

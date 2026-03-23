@@ -1,0 +1,32 @@
+[10:28:59] === KontentumClient start 2025-09-30 10:28:59 ===
+__________________________________________________
+                                                  
+    @@                            @@              
+    @@                                            
+    @@    @@@@@@@@@@@@@@@@@@@@@@@@@@  @@@@@@@@    
+    @@    @@      @@  @@          @@  @@          
+    @@    @@      @@  @@      @@  @@  @@          
+    @@            @@  @@      @@  @@  @@          
+    @@@@@@@@@@@@@@@@  @@@@@@  @@  @@  @@@@@@@     
+                              @@                  
+                              @@                  
+                      @@@@@@@@@@                  
+                                                  
+    I   N   T   E   R   A   C   T   I   V   E     
+                                                  
+    Build : 30/09/2025 10:28 
+__________________________________________________
+                                                  
+[10:29:04] [TRACE] client.ServerCommunicator.startNet:115  Local IP: 172.24.144.1 | Mac-adress: 00:15:5D:4B:40:EC | Hostname:TOMMY-LOGICII
+/// KONTENTUM ASSET DOWNLOADER /// (Build: 30/09/2025 10:28)
+
+[10:29:05] [TRACE] fox.kontentum.Kontentum.getREST:192  https://kontentum.link/rest/getExhibit/s3sxqb/false/false
+[10:29:05] [TRACE] fox.kontentum.Kontentum.JSONReady:241  Kontentum data for exhibit "s3sxqb" loaded.
+[10:29:05] [TRACE] fox.kontentum.Kontentum.onQueueCompleted:696  All files downloaded!!
+[10:29:05] [TRACE] client.ServerCommunicator.makeRequest:181  Send ping request
+[10:29:06] [TRACE] client.ServerCommunicator.onPingData:274  ResponseData : [callback => , ping => 30, sleep => false, success => true, launch => c:/Logic/app/run.bat]
+[10:29:06] [TRACE] utils.WindowsUtils.setPersistentProcess:262  Detected batch/script file. Disabling process monitoring: c:/Logic/app/run.bat
+[10:29:06] [TRACE] utils.WindowsUtils.setPersistentProcess:299  process failed to start....
+[10:29:06] [TRACE] client.ServerCommunicator.pingCallback:154  Changing ping time to : 30
+[10:29:06] [TRACE] client.ServerCommunicator.makeRequest:181  Send ping request
+[10:29:07] [TRACE] client.ServerCommunicator.onPingData:274  ResponseData : [callback => , ping => 30, sleep => false, success => true, launch => c:/Logic/app/run.bat]

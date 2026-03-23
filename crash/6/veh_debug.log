@@ -1,0 +1,41 @@
+[08:14:42] VEH called: code=0xE06D7363
+[08:14:42] VEH called: code=0xE06D7363
+[12:34:45] VEH called: code=0xE06D7363
+[12:34:45] VEH called: code=0xE06D7363
+[16:07:56] VEH called: code=0xE06D7363
+[16:07:56] VEH called: code=0xE06D7363
+[08:17:10] VEH called: code=0xE06D7363
+[08:17:10] VEH called: code=0xE06D7363
+[08:39:10] VEH called: code=0xE06D7363
+[08:39:10] VEH called: code=0xE06D7363
+[08:48:18] VEH called: code=0xC0000005
+[08:48:18] VEH: Fatal exception detected, handling crash...
+[08:48:18] VEH: Calling KC_HandleCrash...
+[08:48:18] KC_SubmitCrashEvent called
+[08:48:18] KC_SubmitCrashEvent: Base URL = https://kontentum.link//rest/submitEvent/5wocyc/936/
+[08:48:18] KC_SubmitCrashEvent: Calling URL (truncated): https://kontentum.link//rest/submitEvent/5wocyc/936/%5BNATIVE_CRASH%5D%20%3A%20%28VEH%29%20ACCESS_VIOLATION%20%40%200xC0000005...
+[08:48:18] KC_SubmitCrashEvent: InternetOpen succeeded
+[08:48:18] KC_SubmitCrashEvent: HTTP response (16 bytes): {"success":true}
+[08:48:18] KC_SubmitCrashEvent: HTTP request completed
+[08:48:18] KC_SubmitCrashEvent: Done
+[08:48:18] VEH: KC_HandleCrash completed
+[08:48:18] VEH: Calling TerminateProcess...
+[13:36:27] VEH called: code=0xE06D7363
+[13:36:27] VEH called: code=0xE06D7363
+[15:23:43] VEH called: code=0xE06D7363
+[15:23:43] VEH called: code=0xE06D7363
+[16:17:14] VEH called: code=0xE06D7363
+[16:17:14] VEH called: code=0xE06D7363
+[16:17:14] VEH called: code=0xE06D7363
+[16:35:13] VEH called: code=0xE06D7363
+[16:35:13] VEH called: code=0xE06D7363
+[12:08:15] VEH called: code=0xE06D7363
+[12:08:15] VEH called: code=0xE06D7363
+[08:16:14] VEH called: code=0xE06D7363
+[08:16:14] VEH called: code=0xE06D7363
+[09:13:16] VEH called: code=0xE06D7363
+[09:13:16] VEH called: code=0xE06D7363
+[13:49:46] VEH called: code=0xE06D7363
+[13:49:46] VEH called: code=0xE06D7363
+[08:13:42] VEH called: code=0xE06D7363
+[08:13:42] VEH called: code=0xE06D7363

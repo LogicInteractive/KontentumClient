@@ -1,0 +1,39 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(haxe:*)",
+      "Bash(cat:*)",
+      "Bash(taskkill:*)",
+      "Bash(dir:*)",
+      "Bash(findstr:*)",
+      "Read(//c/dev/fox/fox/hx/fox/native/windows/**)",
+      "Bash(start /B cmd /c:*)",
+      "Bash(tasklist)",
+      "Bash(tasklist:*)",
+      "Bash(cmd /c \"tasklist | find /I \"\"Kontentum\"\"\")",
+      "Bash(start \"\" TestChromeCrash.exe)",
+      "Bash(cmd /c:*)",
+      "Read(//c/Program Files (x86)/Microsoft/Edge/Application/**)",
+      "Bash(timeout:*)",
+      "Bash(./TestChromeCrash.exe)",
+      "Bash(.KontentumClient.exe --install)",
+      "Bash(reg query:*)",
+      "Bash(powershell:*)",
+      "Bash(./KontentumClient.exe --install)",
+      "Bash(awk:*)",
+      "Bash(xargs cat:*)",
+      "Bash(export APP_RESTARTED=1)",
+      "Bash(start \"\" KontentumClient.exe)",
+      "Bash(start \"\" KontentumClient.exe --skip)",
+      "Bash(./TrayTest.exe)",
+      "Read(//c/Logic interactive Dropbox/tommy _/projects/Logic/KontentumClient_n/src/**)",
+      "Read(//c/Logic interactive Dropbox/tommy _/projects/Logic/KontentumClient_n/**)",
+      "Read(//c/Logic interactive Dropbox/tommy _/projects/Logic/KontentumClient_n/bin/**)",
+      "Bash(./TestFreeze.exe)",
+      "Read(//c/Logic interactive Dropbox/tommy _/projects/Logic/**)",
+      "Read(//d/Logic interactive Dropbox/tommy _/dev/fox/fox/hx/**)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
