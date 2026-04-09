@@ -6,5 +6,5 @@ sudo chmod +x ./KontentumNC
 
 to run setup script:
 ```
-irm https://raw.githubusercontent.com/LogicInteractive/KontentumClient/main/setup-kiosk.ps1 | iex
+irm https://raw.githubusercontent.com/LogicInteractive/KontentumClient/refs/heads/master/setup-kiosk.ps1 | iex
 ```
