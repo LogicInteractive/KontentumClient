@@ -1,6 +1,6 @@
 # ============================================================================
 # Logic Interactive - Kiosk/Installation PC Setup Script
-# Run:  irm https://raw.githubusercontent.com/YOUR_REPO/main/setup-kiosk.ps1 | iex
+# Run:  irm https://raw.githubusercontent.com/LogicInteractive/KontentumClient/refs/heads/master/setup-kiosk.ps1 | iex
 # ============================================================================
 
 # --- Self-elevate to admin if needed ---
@@ -8,12 +8,28 @@ if (-not ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdenti
     [Security.Principal.WindowsBuiltInRole]::Administrator))
 {
     Write-Host "Requesting admin privileges..." -ForegroundColor Yellow
-    $scriptUrl = "https://raw.githubusercontent.com/YOUR_REPO/main/setup-kiosk.ps1"
+    $scriptUrl = "https://raw.githubusercontent.com/LogicInteractive/KontentumClient/refs/heads/master/setup-kiosk.ps1"
     Start-Process powershell -Verb RunAs -ArgumentList "-ExecutionPolicy Bypass -c `"irm $scriptUrl | iex`""
     exit
 }
 
 $ErrorActionPreference = "SilentlyContinue"
+
+Write-Host ""
+Write-Host "============================================" -ForegroundColor Magenta
+Write-Host " Logic Interactive - Kiosk PC Setup" -ForegroundColor Magenta
+Write-Host "============================================" -ForegroundColor Magenta
+Write-Host " This script will:" -ForegroundColor White
+Write-Host "  - Disable Smart App Control" -ForegroundColor Gray
+Write-Host "  - Disable Windows Update + nag screens" -ForegroundColor Gray
+Write-Host "  - Disable Copilot / AI / Recall" -ForegroundColor Gray
+Write-Host "  - Disable Widgets, Search, Telemetry" -ForegroundColor Gray
+Write-Host "  - Disable all power saving / sleep / screensaver" -ForegroundColor Gray
+Write-Host "  - Set performance to maximum" -ForegroundColor Gray
+Write-Host "  - Disable accessibility key prompts" -ForegroundColor Gray
+Write-Host "  - Clean up taskbar" -ForegroundColor Gray
+Write-Host "============================================" -ForegroundColor Magenta
+Write-Host ""
 
 function Write-Step($msg) { Write-Host "`n>> $msg" -ForegroundColor Cyan }
 function Write-Ok($msg)   { Write-Host "   OK: $msg" -ForegroundColor Green }
@@ -273,3 +289,5 @@ Write-Ok "Explorer restarted"
 Write-Host "`n========================================" -ForegroundColor Green
 Write-Host " Setup complete! Reboot recommended." -ForegroundColor Green
 Write-Host "========================================`n" -ForegroundColor Green
+Write-Host "Press any key to exit..." -ForegroundColor Yellow
+$null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
