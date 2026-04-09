@@ -9,7 +9,9 @@ if (-not ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdenti
 {
     Write-Host "Requesting admin privileges..." -ForegroundColor Yellow
     $scriptUrl = "https://raw.githubusercontent.com/LogicInteractive/KontentumClient/refs/heads/master/setup-kiosk.ps1"
-    Start-Process powershell -Verb RunAs -ArgumentList "-ExecutionPolicy Bypass -c `"irm $scriptUrl | iex`""
+    $tmp = "$env:TEMP\setup-kiosk.ps1"
+    Invoke-WebRequest -Uri $scriptUrl -OutFile $tmp -UseBasicParsing
+    Start-Process powershell -Verb RunAs -ArgumentList "-ExecutionPolicy Bypass -File `"$tmp`""
     exit
 }
 
