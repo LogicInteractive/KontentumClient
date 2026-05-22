@@ -39,13 +39,15 @@ class Log
 
 		logFile = Path.join([logDir, "client.log"]);
 
-		// Funnel haxe trace:
+		// Funnel haxe trace to console only (not to log file).
+		// Log file is reserved for errors and important state changes.
 		haxe.Log.trace = function (v:Dynamic, ?infos:haxe.PosInfos):Void
 		{
+			#if sys
 			var where = infos != null ? '${infos.className}.${infos.methodName}:${infos.lineNumber}' : '';
-			write('[TRACE] ' + where + '  ' + Std.string(v));
+			Sys.println('[TRACE] ' + where + '  ' + Std.string(v));
+			#end
 		};
-		write("=== KontentumClient start " + Date.now().toString() + " ===");
 	}
 
 	public static inline function path():String

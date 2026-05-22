@@ -23,12 +23,9 @@ package utils;
     // Globals
     /////////////////
     static const UINT KC_TRAY_MSG = WM_APP + 123;
-    static const UINT KC_CMD_STATUS   = 1000; // non-clickable info row
-    static const UINT KC_CMD_SHOW_LOGS = 1001;
-    static const UINT KC_CMD_RESTART   = 1002;
-    static const UINT KC_CMD_QUIT      = 1003;
-    static const UINT KC_CMD_TEST_CRASH = 1004;
-    static const UINT KC_CMD_TEST_HAXE_EX = 1005;
+    static const UINT KC_CMD_STATUS  = 1000; // non-clickable info row
+    static const UINT KC_CMD_RESTART = 1002;
+    static const UINT KC_CMD_QUIT    = 1003;
 
     static HINSTANCE g_hInst = NULL;
     static HWND g_hWnd = NULL;
@@ -122,11 +119,8 @@ package utils;
             {
                 switch (LOWORD(wParam))
                 {
-                    case KC_CMD_SHOW_LOGS:   InterlockedExchange(&g_lastCmd, KC_CMD_SHOW_LOGS);   break;
-                    case KC_CMD_RESTART:     InterlockedExchange(&g_lastCmd, KC_CMD_RESTART);    break;
-                    case KC_CMD_QUIT:        InterlockedExchange(&g_lastCmd, KC_CMD_QUIT);       break;
-                    case KC_CMD_TEST_CRASH:  InterlockedExchange(&g_lastCmd, KC_CMD_TEST_CRASH); break;
-                    case KC_CMD_TEST_HAXE_EX: InterlockedExchange(&g_lastCmd, KC_CMD_TEST_HAXE_EX); break;
+                    case KC_CMD_RESTART: InterlockedExchange(&g_lastCmd, KC_CMD_RESTART); break;
+                    case KC_CMD_QUIT:    InterlockedExchange(&g_lastCmd, KC_CMD_QUIT);    break;
                 }
                 return 0;
             }
@@ -161,10 +155,6 @@ package utils;
                     if (g_watchdogPingEvent) SetEvent(g_watchdogPingEvent);
 
                     PostMessage(hWnd, WM_NULL, 0, 0);
-                }
-                else if (lParam == WM_LBUTTONDBLCLK)
-                {
-                    InterlockedExchange(&g_lastCmd, KC_CMD_SHOW_LOGS);
                 }
                 return 0;
             }
@@ -269,13 +259,8 @@ package utils;
         g_hMenu = CreatePopupMenu();
         AppendMenuA(g_hMenu, MF_STRING | MF_GRAYED, KC_CMD_STATUS, g_status);
         AppendMenuA(g_hMenu, MF_SEPARATOR, 0, NULL);
-        AppendMenuA(g_hMenu, MF_STRING, KC_CMD_SHOW_LOGS, "Open logs");
-        AppendMenuA(g_hMenu, MF_STRING, KC_CMD_RESTART,   "Restart client");
-        AppendMenuA(g_hMenu, MF_SEPARATOR, 0, NULL);
-        AppendMenuA(g_hMenu, MF_STRING, KC_CMD_TEST_CRASH, "Test Native Crash (DEBUG)");
-        AppendMenuA(g_hMenu, MF_STRING, KC_CMD_TEST_HAXE_EX, "Test Haxe Exception (DEBUG)");
-        AppendMenuA(g_hMenu, MF_SEPARATOR, 0, NULL);
-        AppendMenuA(g_hMenu, MF_STRING, KC_CMD_QUIT,      "Quit");
+        AppendMenuA(g_hMenu, MF_STRING, KC_CMD_RESTART, "Restart client");
+        AppendMenuA(g_hMenu, MF_STRING, KC_CMD_QUIT,    "Quit");
 
         // Add tray icon
         ZeroMemory(&g_nid, sizeof(g_nid));
@@ -421,9 +406,6 @@ class Tray
 		#end
 	}
 
-	public static inline var CMD_SHOW_LOGS   :Int = 1001;
-	public static inline var CMD_RESTART    :Int = 1002;
-	public static inline var CMD_QUIT       :Int = 1003;
-	public static inline var CMD_TEST_CRASH :Int = 1004;
-	public static inline var CMD_TEST_HAXE_EX:Int = 1005;
+	public static inline var CMD_RESTART :Int = 1002;
+	public static inline var CMD_QUIT    :Int = 1003;
 }

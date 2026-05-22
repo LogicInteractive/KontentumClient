@@ -72,9 +72,19 @@ package utils;
 		if (msg[0]) KC_LogLineA(msg);
 	}
 
+	// True iff config.xml set crashDumps=false (KontentumClient.hx puts KC_NO_DUMPS=1 in env)
+	static BOOL KC_DumpsDisabled()
+	{
+		char v[8] = {0};
+		DWORD d = GetEnvironmentVariableA("KC_NO_DUMPS", v, sizeof(v));
+		return (d > 0 && d < sizeof(v) && v[0] == \'1\');
+	}
+
 	// Write a minidump of the current process (called from watchdog thread on timeout)
 	static void KC_WriteWatchdogDump(const char* reason)
 	{
+		if (KC_DumpsDisabled()) return;
+
 		// Build dump directory: prefer KC_LOG_DIR, fallback to exe directory
 		char dumpDir[MAX_PATH] = {0};
 		DWORD len = GetEnvironmentVariableA("KC_LOG_DIR", dumpDir, MAX_PATH);
@@ -94,8 +104,6 @@ package utils;
 			dumpDir, st.wYear, st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond);
 
 		char logBuf[512];
-		sprintf_s(logBuf, "Writing minidump to: %s", dumpPath);
-		KC_LogLineA(logBuf);
 
 		HANDLE hFile = CreateFileA(dumpPath, GENERIC_WRITE, FILE_SHARE_READ, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 		if (hFile != INVALID_HANDLE_VALUE)
@@ -111,11 +119,7 @@ package utils;
 			BOOL ok = MiniDumpWriteDump(GetCurrentProcess(), GetCurrentProcessId(), hFile, mtype, NULL, NULL, NULL);
 			CloseHandle(hFile);
 
-			if (ok)
-			{
-				KC_LogLineA("Minidump written successfully");
-			}
-			else
+			if (!ok)
 			{
 				sprintf_s(logBuf, "MiniDumpWriteDump failed (err=0x%08X)", (unsigned)GetLastError());
 				KC_LogLineA(logBuf);
@@ -223,8 +227,6 @@ package utils;
 		snprintf(fullURL, sizeof(fullURL), "%s%s", g_submitEventBaseURL, encodedMsg);
 
 		char logMsg[512];
-		sprintf_s(logMsg, "Submitting event: %s", fullURL);
-		KC_LogLineA(logMsg);
 
 		HINTERNET hInternet = InternetOpenA("KontentumWatchdog/1.0", INTERNET_OPEN_TYPE_DIRECT, NULL, NULL, 0);
 		if (hInternet)
@@ -240,11 +242,6 @@ package utils;
 				char responseBuffer[512];
 				DWORD bytesRead = 0;
 				InternetReadFile(hConnect, responseBuffer, sizeof(responseBuffer) - 1, &bytesRead);
-				responseBuffer[bytesRead] = 0;
-
-				sprintf_s(logMsg, "Event submitted (%lu bytes): %.100s", bytesRead, responseBuffer);
-				KC_LogLineA(logMsg);
-
 				InternetCloseHandle(hConnect);
 			}
 			else
@@ -263,8 +260,6 @@ package utils;
 		if (!g_notifyURL || !*g_notifyURL) return;
 
 		char logMsg[512];
-		sprintf_s(logMsg, "Notifying server: %s", g_notifyURL);
-		KC_LogLineA(logMsg);
 
 		HINTERNET hInternet = InternetOpenA("KontentumWatchdog/1.0", INTERNET_OPEN_TYPE_DIRECT, NULL, NULL, 0);
 		if (hInternet)
@@ -281,7 +276,6 @@ package utils;
 				char responseBuffer[512];
 				DWORD bytesRead = 0;
 				InternetReadFile(hConnect, responseBuffer, sizeof(responseBuffer) - 1, &bytesRead);
-				KC_LogLineA("Server notification completed");
 				InternetCloseHandle(hConnect);
 			}
 			else
@@ -298,122 +292,165 @@ package utils;
 		}
 	}
 
-	static BOOL KC_IsMemoryCritical()
+	// ===== Notify throttle (shared with CrashHandler via on-disk timestamp file) =====
+	// Critical: prevents the client from spamming the server during a restart loop.
+	static __int64 KC_GetUnixTime()
 	{
-		MEMORYSTATUSEX m; m.dwLength = sizeof(m);
-		if (!GlobalMemoryStatusEx(&m)) return FALSE;
-		BOOL overLoad = (m.dwMemoryLoad > 90);
-		double virtUse = 0.0;
-		if (m.ullTotalVirtual) virtUse = (double)(m.ullTotalVirtual - m.ullAvailVirtual) / (double)m.ullTotalVirtual;
-		return overLoad || (virtUse > 0.95);
+		SYSTEMTIME st; GetSystemTime(&st);
+		FILETIME ft; SystemTimeToFileTime(&st, &ft);
+		ULARGE_INTEGER u; u.LowPart = ft.dwLowDateTime; u.HighPart = ft.dwHighDateTime;
+		return (__int64)((u.QuadPart - 116444736000000000ULL) / 10000000ULL);
+	}
+
+	static void KC_GetThrottlePath(char* out, size_t outSize)
+	{
+		out[0] = 0;
+		DWORD d = GetEnvironmentVariableA("KC_LOG_DIR", out, (DWORD)outSize);
+		if (d == 0 || d >= outSize) return;
+		strcat_s(out, outSize, "\\\\notify_lastsent.tmp");
+	}
+
+	static BOOL KC_IsNotifyThrottled(int windowSec)
+	{
+		char path[MAX_PATH] = {0};
+		KC_GetThrottlePath(path, MAX_PATH);
+		if (!path[0]) return FALSE;
+
+		HANDLE h = CreateFileA(path, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE,
+			NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+		if (h == INVALID_HANDLE_VALUE) return FALSE;
+		char buf[32] = {0};
+		DWORD read = 0;
+		ReadFile(h, buf, sizeof(buf) - 1, &read, NULL);
+		CloseHandle(h);
+		if (read == 0) return FALSE;
+		__int64 last = _atoi64(buf);
+		__int64 now = KC_GetUnixTime();
+		return (now - last) < (__int64)windowSec;
+	}
+
+	static void KC_RecordNotifyTime()
+	{
+		char path[MAX_PATH] = {0};
+		KC_GetThrottlePath(path, MAX_PATH);
+		if (!path[0]) return;
+		HANDLE h = CreateFileA(path, GENERIC_WRITE, FILE_SHARE_READ,
+			NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+		if (h == INVALID_HANDLE_VALUE) return;
+		char buf[32];
+		int n = sprintf_s(buf, "%lld", (long long)KC_GetUnixTime());
+		DWORD w = 0;
+		WriteFile(h, buf, (DWORD)n, &w, NULL);
+		CloseHandle(h);
+	}
+
+	// Stop the watchdog cleanly when Windows is shutting down or user is logging off.
+	// Without this the watchdog can fire during shutdown and submit a fake crash event.
+	static BOOL WINAPI KC_WatchdogCtrlHandler(DWORD ctrlType)
+	{
+		switch (ctrlType)
+		{
+			case CTRL_SHUTDOWN_EVENT:
+			case CTRL_LOGOFF_EVENT:
+			case CTRL_CLOSE_EVENT:
+				g_isRunning = FALSE;
+				if (g_pingEvent) SetEvent(g_pingEvent);
+				return TRUE;
+		}
+		return FALSE;
 	}
 
 	static unsigned __stdcall KC_WatchdogThread(void* data)
 	{
-		KC_LogLineA("Watchdog thread started");
 		while (g_isRunning)
 		{
 			DWORD wr = WaitForSingleObject(g_pingEvent, g_timeoutMs);
-			if (wr == WAIT_TIMEOUT || KC_IsMemoryCritical())
+			if (!g_isRunning) break;                         // clean shutdown signaled
+			if (wr != WAIT_TIMEOUT) { ResetEvent(g_pingEvent); continue; }
+
+			// Heartbeat timeout. Bail out cleanly if Windows is shutting down.
+			if (GetSystemMetrics(SM_SHUTTINGDOWN)) break;
+
+			const char* reason = "Heartbeat timeout";
+			KC_LogCrash(reason, GetLastError());
+
+			// Rate-limit dump + server notification to once per 10 minutes.
+			// Without this a restart loop spams the server (1000 events/night observed).
+			if (!KC_IsNotifyThrottled(600))
 			{
-				const char* reason = wr == WAIT_TIMEOUT ? "Heartbeat timeout" : "Memory critical";
-				KC_LogCrash(reason, GetLastError());
-
-				// Write minidump before doing anything else (shows what threads are doing)
+				KC_RecordNotifyTime();
 				KC_WriteWatchdogDump(reason);
-
-				// Submit event with crash reason (best effort, 5s timeout)
 				KC_SubmitEvent(reason);
-
-				// Also notify server (legacy notification URL)
 				KC_NotifyServer(reason);
+			}
+			else
+			{
+				KC_LogLineA("Watchdog notify throttled");
+			}
 
-				if (g_restartCommand && g_restartCommand[0])
+			if (g_restartCommand && g_restartCommand[0])
+			{
+				// Build environment block with APP_RESTARTED=1 so the new process
+				// knows it was respawned by us.
+				wchar_t* currentEnv = GetEnvironmentStringsW();
+				size_t envSize = 0;
+				wchar_t* p = currentEnv;
+				while (*p)
 				{
-					// Log the restart command for debugging
-					char cmdBuf[512];
-					WideCharToMultiByte(CP_UTF8, 0, g_restartCommand, -1, cmdBuf, sizeof(cmdBuf), NULL, NULL);
-					char logBuf[600];
-					sprintf_s(logBuf, "Restart command: %s", cmdBuf);
-					KC_LogLineA(logBuf);
+					size_t len = wcslen(p) + 1;
+					envSize += len;
+					p += len;
+				}
+				envSize++; // Final null terminator
 
-					// Build environment block with APP_RESTARTED=1
-					// Get current environment
-					wchar_t* currentEnv = GetEnvironmentStringsW();
+				const wchar_t* newVar = L"APP_RESTARTED=1";
+				size_t newVarLen = wcslen(newVar) + 1;
 
-					// Calculate size needed for new environment (current + our variable + null terminators)
-					size_t envSize = 0;
-					wchar_t* p = currentEnv;
-					while (*p)
-					{
-						size_t len = wcslen(p) + 1;
-						envSize += len;
-						p += len;
-					}
-					envSize++; // Final null terminator
+				wchar_t* newEnv = (wchar_t*)malloc((envSize + newVarLen + 1) * sizeof(wchar_t));
+				if (newEnv)
+				{
+					memcpy(newEnv, currentEnv, envSize * sizeof(wchar_t));
+					wcscpy_s(newEnv + envSize - 1, newVarLen + 1, newVar);
+					newEnv[envSize + newVarLen - 1] = 0;
+					newEnv[envSize + newVarLen] = 0; // Double null terminator
+				}
+				FreeEnvironmentStringsW(currentEnv);
 
-					// Add space for APP_RESTARTED=1
-					const wchar_t* newVar = L"APP_RESTARTED=1";
-					size_t newVarLen = wcslen(newVar) + 1;
+				STARTUPINFOW si; ZeroMemory(&si, sizeof(si)); si.cb = sizeof(si);
+				PROCESS_INFORMATION pi; ZeroMemory(&pi, sizeof(pi));
 
-					// Allocate new environment block
-					wchar_t* newEnv = (wchar_t*)malloc((envSize + newVarLen + 1) * sizeof(wchar_t));
-					if (newEnv)
-					{
-						// Copy existing environment
-						memcpy(newEnv, currentEnv, envSize * sizeof(wchar_t));
+				// Release the app single-instance mutex BEFORE spawning the restart
+				// process so the new instance can acquire it.
+				if (g_appMutexHandle)
+				{
+					ReleaseMutex(g_appMutexHandle);
+					CloseHandle(g_appMutexHandle);
+					g_appMutexHandle = NULL;
+				}
 
-						// Add our variable at the end (before final null)
-						wcscpy_s(newEnv + envSize - 1, newVarLen + 1, newVar);
-						newEnv[envSize + newVarLen - 1] = 0; // Null terminator
-						newEnv[envSize + newVarLen] = 0; // Double null terminator for end of environment
-					}
-					FreeEnvironmentStringsW(currentEnv);
-
-					STARTUPINFOW si; ZeroMemory(&si, sizeof(si)); si.cb = sizeof(si);
-					PROCESS_INFORMATION pi; ZeroMemory(&pi, sizeof(pi));
-
-					// Release the app single-instance mutex BEFORE spawning restart process
-					// so the new process can acquire it
-					if (g_appMutexHandle)
-					{
-						KC_LogLineA("Releasing app mutex before restart");
-						ReleaseMutex(g_appMutexHandle);
-						CloseHandle(g_appMutexHandle);
-						g_appMutexHandle = NULL;
-					}
-
-					// Use DETACHED_PROCESS to ensure child is independent from parent console
-					// CREATE_UNICODE_ENVIRONMENT is required when passing wide-char env block
-					DWORD creationFlags = DETACHED_PROCESS | CREATE_NEW_PROCESS_GROUP | CREATE_UNICODE_ENVIRONMENT;
-					if (CreateProcessW(NULL, g_restartCommand, NULL, NULL, FALSE, creationFlags, newEnv, NULL, &si, &pi))
-					{
-						CloseHandle(pi.hThread);
-						CloseHandle(pi.hProcess);
-						KC_LogLineA("Restart command launched");
-					}
-					else
-					{
-						char errBuf[256];
-						sprintf_s(errBuf, "CreateProcessW failed for restart (err=0x%08X)", (unsigned)GetLastError());
-						KC_LogLineA(errBuf);
-					}
-
-					// Free the environment block
-					if (newEnv) free(newEnv);
+				DWORD creationFlags = DETACHED_PROCESS | CREATE_NEW_PROCESS_GROUP | CREATE_UNICODE_ENVIRONMENT;
+				if (CreateProcessW(NULL, g_restartCommand, NULL, NULL, FALSE, creationFlags, newEnv, NULL, &si, &pi))
+				{
+					CloseHandle(pi.hThread);
+					CloseHandle(pi.hProcess);
 				}
 				else
 				{
-					KC_LogLineA("No restart command set");
+					char errBuf[256];
+					sprintf_s(errBuf, "CreateProcessW failed for restart (err=0x%08X)", (unsigned)GetLastError());
+					KC_LogLineA(errBuf);
 				}
 
-				// Kill current process; watchdog is inside same process, so this will end everything.
-				TerminateProcess(GetCurrentProcess(), 1);
-				break;
+				if (newEnv) free(newEnv);
 			}
-			ResetEvent(g_pingEvent);
+			else
+			{
+				KC_LogLineA("No restart command set");
+			}
+
+			TerminateProcess(GetCurrentProcess(), 1);
+			break;
 		}
-		KC_LogLineA("Watchdog thread exiting");
 		return 0;
 	}
 
@@ -444,6 +481,10 @@ package utils;
 			return FALSE;
 		}
 		g_watchdogThread = (HANDLE)th;
+
+		// Detect Windows shutdown / user logoff so the watchdog stops cleanly
+		// instead of submitting a false "Heartbeat timeout" event.
+		SetConsoleCtrlHandler(KC_WatchdogCtrlHandler, TRUE);
 		return TRUE;
 	}
 
@@ -451,6 +492,7 @@ package utils;
 	{
 		if (!g_isRunning) return TRUE;
 		g_isRunning = FALSE;
+		SetConsoleCtrlHandler(KC_WatchdogCtrlHandler, FALSE);
 		if (g_watchdogThread)
 		{
 			SetEvent(g_pingEvent);

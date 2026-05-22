@@ -269,10 +269,16 @@ class KontentumClient
 		// Check if this was a watchdog restart
 		var wasRestarted = Sys.getEnv("APP_RESTARTED");
 
+		// Place the counter next to the exe. A relative path here would resolve
+		// against the (often unrelated) working directory of the spawning shell
+		// and silently fail to persist, defeating the restart-loop guard.
+		var restartFile = haxe.io.Path.join([
+			haxe.io.Path.directory(Sys.programPath()),
+			"restart_count.tmp"
+		]);
+
 		if (wasRestarted == "1")
 		{
-			// This is a restart - check the restart counter file
-			var restartFile = "bin/restart_count.tmp";
 
 			try
 			{
@@ -350,7 +356,6 @@ class KontentumClient
 			// Normal startup - clear restart counter
 			try
 			{
-				var restartFile = "bin/restart_count.tmp";
 				if (sys.FileSystem.exists(restartFile))
 				{
 					sys.FileSystem.deleteFile(restartFile);
@@ -533,7 +538,6 @@ class KontentumClient
 
 		// Set restart command for CrashHandler (handles unhandled exceptions)
 		utils.CrashHandler.setRestartCommand(restartCmd);
-		utils.Log.write("[CrashHandler] Restart command configured: " + restartCmd);
 		#end
 
 		// Start watchdog only if enabled (can be disabled with --no-watchdog flag)
@@ -643,6 +647,17 @@ class KontentumClient
 			}
 		}
 
+		// Honour <crashDumps>false</crashDumps>: suppress minidump writes and veh_debug.log.
+		// Server submissions are unaffected (already throttled to once per 10 min).
+		#if windows
+		if (config.crashDumps == false)
+		{
+			Sys.putEnv("KC_NO_DUMPS", "1");
+			if (debug)
+				trace("Crash dumps disabled via config.xml");
+		}
+		#end
+
 		// Set submitEvent URL for crash reporting (CrashHandler and Watchdog)
 		// Format: /rest/submitEvent/{token}/{clientID}/ (message appended)
 		if (config.kontentum != null && config.kontentum.exhibitToken != null && config.kontentum.clientID > 0)
@@ -654,7 +669,7 @@ class KontentumClient
 			// Set for CrashHandler (unhandled exceptions)
 			utils.CrashHandler.setSubmitEventURL(submitEventURL);
 
-			// Set for Watchdog (heartbeat timeout, memory critical)
+			// Set for Watchdog (heartbeat timeout)
 			if (enableWatchdog)
 			{
 				utils.WatchDog.setSubmitEventURL(submitEventURL);
@@ -665,16 +680,7 @@ class KontentumClient
 					config.kontentum.exhibitToken + "/" +
 					idToUse + "/WatchdogCrashDetected";
 				utils.WatchDog.setNotifyURL(notifyURL);
-
-				if (debug)
-				{
-					var source = appID > 0 ? "app_id" : "clientID";
-					trace("Watchdog notification URL: " + notifyURL + " (using " + source + ")");
-				}
 			}
-
-			if (debug)
-				trace("Crash/Event submitEvent URL: " + submitEventURL);
 		}
 
 		// Check if startup installation check should be performed
@@ -1292,15 +1298,6 @@ class KontentumClient
 
 				switch (utils.Tray.pollCommand())
 				{
-					case utils.Tray.CMD_SHOW_LOGS:
-					{
-						// Open the log file in default text editor
-						#if windows
-						var logPath = utils.Log.path();
-						// Use start command to open with default editor
-						Sys.command('cmd', ['/c', 'start', '', logPath]);
-						#end
-					}
 					case utils.Tray.CMD_RESTART:
 					{
 						// Restart the KontentumClient application
@@ -1308,8 +1305,6 @@ class KontentumClient
 						utils.WatchDog.stop();
 						Mutex.release();
 						var exe = Sys.programPath();
-						// Launch new instance and exit this one
-						// Use start with empty title and path without extra quotes
 						Sys.command('cmd', ['/c', 'start', '', exe]);
 						Sys.exit(0);
 						#end
@@ -1323,18 +1318,6 @@ class KontentumClient
 						Mutex.release();
 						#end
 						Sys.exit(0);
-					}
-					case utils.Tray.CMD_TEST_CRASH:
-					{
-						// DEBUG: Trigger a native crash (ACCESS_VIOLATION) to verify VEH handler
-						utils.Log.write("[DEBUG] Test native crash triggered from tray menu");
-						utils.CrashHandler.testAccessViolation();
-					}
-					case utils.Tray.CMD_TEST_HAXE_EX:
-					{
-						// DEBUG: Trigger a Haxe exception to verify exception handler
-						utils.Log.write("[DEBUG] Test Haxe exception triggered from tray menu");
-						utils.CrashHandler.testHaxeException();
 					}
 					case 0:
 				}
@@ -1357,6 +1340,7 @@ typedef ConfigXML =
 	var killexplorer		: Null<Bool>;
 	var debug				: Null<Bool>;
 	var watchdog			: Null<Bool>;			// Enable/disable watchdog (null = enabled by default)
+	var crashDumps			: Null<Bool>;			// Write minidumps + veh_debug.log on crashes/timeouts (null = enabled by default)
 	var disableStartupInstall: Null<Bool>;		// Disable startup installation prompt (for shell:startup scenarios)
 	// var restartAutomatic	: Bool;
 	var overridelaunch		: String;
